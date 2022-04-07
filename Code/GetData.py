@@ -67,27 +67,6 @@ def get_data(data_dir, window, inference, scaler, seed=422):
         all_inp = np.array(all_inp)
         all_tar = np.array(all_tar)
 
-        # w = 2  # n of column
-        # h = len(all_inp)  # n of row
-        # matrix = [[0 for x in range(w)] for y in range(h)]
-        # for i in range(h):
-        #     matrix[i][0] = all_inp[i]
-        #     matrix[i][1] = all_tar[i]
-        #
-        # N = all_inp.shape[0]
-        # n_train = N // 100 * 85
-        # n_val = (N - n_train)
-        #
-        # for n in range(n_train):
-        #     x.append(matrix[n][0])
-        #     y.append(matrix[n][1])
-        #
-        # for n in range(n_val):
-        #     x_val.append(matrix[n_train + n][0])
-        #     y_val.append(matrix[n_train + n][1])
-        #
-
-
         N = all_inp.shape[0]
         n_train = N // 100 * 85
         n_val = (N - n_train)
@@ -137,8 +116,8 @@ def get_data(data_dir, window, inference, scaler, seed=422):
 
         N = all_inp.shape[0]
         for n in range(N):
-            x_test.append(all_inp[n][0])
-            y_test.append(all_tar[n][1])
+            x_test.append(all_inp[n])
+            y_test.append(all_tar[n])
 
         x_test = np.array(x_test)
         y_test = np.array(y_test)
