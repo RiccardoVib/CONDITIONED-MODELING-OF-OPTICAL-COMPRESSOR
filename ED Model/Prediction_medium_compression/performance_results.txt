@@ -1,0 +1,30 @@
+
+ Sound   :  _sweep_
+
+ Model   :  ED
+
+ ESR   :  0.7598571805883573
+
+ Sound   :  _guitar_
+
+ Model   :  ED
+
+ ESR   :  0.02032922742717021
+
+ Sound   :  _drumKick_
+
+ Model   :  ED
+
+ ESR   :  0.02736838187240214
+
+ Sound   :  _drumHH_
+
+ Model   :  ED
+
+ ESR   :  1.3445022272942222
+
+ Sound   :  _bass_
+
+ Model   :  ED
+
+ ESR   :  0.03750301642322122
