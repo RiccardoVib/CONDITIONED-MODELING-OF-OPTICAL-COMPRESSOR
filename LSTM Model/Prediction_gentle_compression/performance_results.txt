@@ -1,0 +1,30 @@
+
+ Sound   :  _sweep_
+
+ Model   :  LSTM
+
+ ESR   :  0.014200126510956116
+
+ Sound   :  _guitar_
+
+ Model   :  LSTM
+
+ ESR   :  0.005876048033662905
+
+ Sound   :  _drumKick_
+
+ Model   :  LSTM
+
+ ESR   :  0.009181689406706448
+
+ Sound   :  _drumHH_
+
+ Model   :  LSTM
+
+ ESR   :  0.0287018496721644
+
+ Sound   :  _bass_
+
+ Model   :  LSTM
+
+ ESR   :  0.013138271498598602
