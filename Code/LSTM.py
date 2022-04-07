@@ -5,11 +5,10 @@ from GetData import get_data
 from scipy.io import wavfile
 from tensorflow.keras.layers import Input, Dense, LSTM
 from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam, SGD
 import pickle
 
 #
-def trainLSTM(data_dir, epochs, seed=422, data=None, **kwargs):
+def trainLSTM(data_dir, epochs, seed=422, **kwargs):
     ckpt_flag = kwargs.get('ckpt_flag', False)
     b_size = kwargs.get('b_size', 128)
     learning_rate = kwargs.get('learning_rate', 0.001)
@@ -21,9 +20,14 @@ def trainLSTM(data_dir, epochs, seed=422, data=None, **kwargs):
     loss_type = kwargs.get('loss_type', 'mse')
     w_length = kwargs.get('w_length', 16)
     act = kwargs.get('act', 'tanh')
+    scaler = None
 
+    if inference:
+        file_scaler = open(os.path.normpath('/'.join([data_dir, 'scaler.pickle'])), 'rb')
+        scaler = pickle.load(file_scaler)
 
-    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, seed=seed)
+    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference, scaler=scaler,
+                                                                              seed=seed)
 
     layers = len(units)
     n_units = ''

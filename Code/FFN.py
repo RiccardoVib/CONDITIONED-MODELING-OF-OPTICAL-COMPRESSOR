@@ -8,7 +8,7 @@ from tensorflow.keras.models import Model
 import pickle
 
 
-def trainDense(data_dir, epochs, seed=422, data=None, **kwargs):
+def trainDense(data_dir, epochs, seed=422, **kwargs):
     ckpt_flag = kwargs.get('ckpt_flag', False)
     b_size = kwargs.get('b_size', 128)
     learning_rate = kwargs.get('learning_rate', 0.001)
@@ -18,10 +18,15 @@ def trainDense(data_dir, epochs, seed=422, data=None, **kwargs):
     opt_type = kwargs.get('opt_type', 'Adam')
     inference = kwargs.get('inference', False)
     loss_type = kwargs.get('loss_type', 'mse')
-    w_length = kwargs.get('w_length', 1)
+    w_length = kwargs.get('w_length', 1 )
     act = kwargs.get('act', 'tanh')
+    scaler = None
 
-    x, y, x_val, y_val, x_test, y_test, scaler, zero_value, fs = get_data(data_dir=data_dir, w_length=w_length,
+    if inference:
+        file_scaler = open(os.path.normpath('/'.join([data_dir, 'scaler.pickle'])), 'rb')
+        scaler = pickle.load(file_scaler)
+
+    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference, scaler=scaler,
                                                                               seed=seed)
 
     layers = len(units)

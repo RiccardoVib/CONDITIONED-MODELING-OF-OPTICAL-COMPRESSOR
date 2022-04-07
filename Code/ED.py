@@ -5,10 +5,9 @@ from GetData import get_data
 from scipy.io import wavfile
 from tensorflow.keras.layers import Input, Dense, LSTM
 from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam, SGD
 import pickle
 
-def trainED(data_dir, epochs, seed=422, data=None, **kwargs):
+def trainED(data_dir, epochs, seed=422, **kwargs):
     ckpt_flag = kwargs.get('ckpt_flag', False)
     b_size = kwargs.get('b_size', 128)
     learning_rate = kwargs.get('learning_rate', 0.001)
@@ -22,6 +21,15 @@ def trainED(data_dir, epochs, seed=422, data=None, **kwargs):
     inference = kwargs.get('inference', False)
     loss_type = kwargs.get('loss_type', 'mse')
     w_length = kwargs.get('w_length', 16)
+    scaler = None
+
+    if inference:
+        file_scaler = open(os.path.normpath('/'.join([data_dir, 'scaler.pickle'])), 'rb')
+        scaler = pickle.load(file_scaler)
+
+    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference,
+                                                              scaler=scaler,
+                                                              seed=seed)
 
     layers_enc = len(encoder_units)
     layers_dec = len(decoder_units)
@@ -36,7 +44,7 @@ def trainED(data_dir, epochs, seed=422, data=None, **kwargs):
     n_units_enc = n_units_enc[:-2]
     n_units_dec = n_units_dec[:-2]
 
-    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, seed=seed)
+    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference, scaler=scaler, seed=seed)
 
     # T past values used to predict the next value
     T = x.shape[1]  # time window
