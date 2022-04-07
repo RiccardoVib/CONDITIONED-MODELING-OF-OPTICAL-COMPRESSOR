@@ -125,7 +125,7 @@ def get_data(data_dir, window, inference, scaler, seed=422):
         thresholds = scaler[2].transform(thresholds)
         ratios = scaler[1].transform(ratios)
 
-        for t in range(inp.shape[1] // window):
+        for t in range(inp.shape[1] - window):
             inp_temp = np.array(
                 [inp[0, t : t + window], np.repeat(ratios[0], window), np.repeat(thresholds[0], window)])
             all_inp.append(inp_temp.T)
