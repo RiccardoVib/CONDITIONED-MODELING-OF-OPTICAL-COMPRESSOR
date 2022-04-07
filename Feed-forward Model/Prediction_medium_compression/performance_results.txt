@@ -1,0 +1,29 @@
+
+ Sound   :  _sweep_
+
+ Model   :  Feed-forward
+
+ ESR   :  0.05268382470640081
+
+ Sound   :  _guitar_
+
+ Model   :  Feed-forward
+
+ ESR   :  0.045210042815369444
+ Sound   :  _drumKick_
+
+ Model   :  Feed-forward
+
+ ESR   :  0.0691459241754729
+
+ Sound   :  _drumHH_
+
+ Model   :  Feed-forward
+
+ ESR   :  0.0730688512517083
+
+ Sound   :  _bass_
+
+ Model   :  Feed-forward
+
+ ESR   :  0.055292120950197
