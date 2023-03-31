@@ -1,24 +1,45 @@
+# Copyright (C) 2023 Riccardo Simionato, University of Oslo
+# Inquiries: riccardo.simionato.vib@gmail.com.com
+#
+# This code is free software: you can redistribute it and/or modify it under the terms
+# of the GNU Lesser General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Less General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License along with this code.
+# If not, see <http://www.gnu.org/licenses/>.
+#
+# If you use this code or any part of it in any program or publication, please acknowledge
+# its authors by adding a reference to this publication:
+#
+# R. Simionato, 2023, "Deep Learning Conditioned Modeling of Optical Compression" in proceedings of the 22th Digital Audio Effect Conference, Vienna, Austria.
+
+
+
 import numpy as np
 import os
 import tensorflow as tf
 from GetData import get_data
 from scipy.io import wavfile
-from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.layers import Input, Dense, LSTM
 from tensorflow.keras.models import Model
 import pickle
 
-
-def trainDense(data_dir, epochs, seed=422, **kwargs):
+#
+def trainLSTM(data_dir, epochs, seed=422, **kwargs):
     ckpt_flag = kwargs.get('ckpt_flag', False)
     b_size = kwargs.get('b_size', 128)
     learning_rate = kwargs.get('learning_rate', 0.001)
     units = kwargs.get('units', [32, 32])
     model_save_dir = kwargs.get('model_save_dir', '../../TrainedModels')
-    save_folder = kwargs.get('save_folder', 'FFN')
+    save_folder = kwargs.get('save_folder', 'LSTM')
     opt_type = kwargs.get('opt_type', 'Adam')
     inference = kwargs.get('inference', False)
     loss_type = kwargs.get('loss_type', 'mse')
-    w_length = kwargs.get('w_length', 1 )
+    w_length = kwargs.get('w_length', 16)
     act = kwargs.get('act', 'tanh')
     scaler = None
 
@@ -38,21 +59,21 @@ def trainDense(data_dir, epochs, seed=422, **kwargs):
 
     # T past values used to predict the next value
     T = x.shape[1]  # time window
-    D = x.shape[2]  # features
+    D = x.shape[2]  # conditioning
 
-    inputs = Input(shape=(T, D), name='input')
-    first_unit = units.pop(0)
+    inputs = Input(shape=(T, D), name='enc_input')
+    first_unit_encoder = units.pop(0)
     if len(units) > 0:
-        last_unit = units.pop()
-        outputs = Dense(first_unit, name='Dense_0')(inputs)
+        last_unit_encoder = units.pop()
+        outputs = LSTM(first_unit_encoder, return_sequences=True, name='LSTM_En0')(inputs)
         for i, unit in enumerate(units):
-            outputs = Dense(unit, name='Dense_' + str(i + 1))(outputs)
-        outputs = Dense(last_unit, activation=act, name='Dense_Fin')(outputs)
+            outputs, state_h, state_c = LSTM(unit, return_sequences=True, name='LSTM_En' + str(i + 1))(outputs)
+        outputs = LSTM(last_unit_encoder, name='LSTM_EnFin')(outputs)
     else:
-        outputs = Dense(first_unit, activation=act, name='Dense')(inputs)
+        outputs = LSTM(first_unit_encoder, name='LSTM_En')(inputs)
 
-    final_outputs = Dense(1, name='DenseLay')(outputs)
-    model = Model(inputs, final_outputs)
+    outputs = Dense(1, activation=act, name='DenseLay')(outputs)
+    model = Model(inputs, outputs)
     model.summary()
 
     if opt_type == 'Adam':
@@ -99,19 +120,21 @@ def trainDense(data_dir, epochs, seed=422, **kwargs):
             print("Initializing random weights.")
 
     early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', min_delta=0.000001, patience=20,
-                                                               restore_best_weights=True,
-                                                               verbose=0)
+                                                               restore_best_weights=True, verbose=0)
     callbacks += [early_stopping_callback]
+
     # train
     if not inference:
-        results = model.fit(x, y, batch_size=b_size, epochs=epochs,
-                            validation_data=(x_val, y_val), callbacks=callbacks, verbose=0)
+        results = model.fit(x, y, batch_size=b_size, epochs=epochs, verbose=0,
+                            validation_data=(x_val, y_val),
+                            callbacks=callbacks)
 
     if ckpt_flag:
         best = tf.train.latest_checkpoint(ckpt_dir)
         if best is not None:
             print("Restored weights from {}".format(ckpt_dir))
             model.load_weights(best)
+
     test_loss = model.evaluate(x_test, y_test, batch_size=b_size, verbose=0)
     print('Test Loss: ', test_loss)
     if inference:
@@ -126,35 +149,37 @@ def trainDense(data_dir, epochs, seed=422, **kwargs):
             'opt_type': opt_type,
             'loss_type': loss_type,
             'layers': layers,
-            'n_units': n_units,
+            'units': n_units,
             'w_length': w_length,
             # 'Train_loss': results.history['loss'],
             'Val_loss': results.history['val_loss']
         }
         print(results)
-    if ckpt_flag:
-        with open(os.path.normpath('/'.join([model_save_dir, save_folder, 'results.txt'])), 'w') as f:
-            for key, value in results.items():
-                print('\n', key, '  : ', value, file=f)
-            pickle.dump(results, open(os.path.normpath('/'.join([model_save_dir, save_folder, 'results.pkl'])), 'wb'))
 
-    if generate_wav is not None:
+    if not inference:
+        if ckpt_flag:
+            with open(os.path.normpath('/'.join([model_save_dir, save_folder, 'results.txt'])), 'w') as f:
+                for key, value in results.items():
+                    print('\n', key, '  : ', value, file=f)
+                pickle.dump(results,
+                            open(os.path.normpath('/'.join([model_save_dir, save_folder, 'results.pkl'])), 'wb'))
+
+    if inference:
 
         predictions = model.predict(x_test)
-
         print('GenerateWavLoss: ', model.evaluate(x_test, y_test, batch_size=b_size, verbose=0))
         predictions = scaler[0].inverse_transform(predictions)
         x_test = scaler[0].inverse_transform(x_test[:, :, 0])
-        y_gen = scaler[0].inverse_transform(y_test)
+        y_test = scaler[0].inverse_transform(y_test)
 
         predictions = predictions.reshape(-1)
         x_test = x_test.reshape(-1)
         y_test = y_test.reshape(-1)
 
         # Define directories
-        pred_name = 'FFN_pred.wav'
-        inp_name = 'FFN_inp.wav'
-        tar_name = 'FFN_tar.wav'
+        pred_name = 'LSTM_pred.wav'
+        inp_name = 'LSTM_inp.wav'
+        tar_name = 'LSTM_tar.wav'
 
         pred_dir = os.path.normpath(os.path.join(model_save_dir, save_folder, 'WavPredictions', pred_name))
         inp_dir = os.path.normpath(os.path.join(model_save_dir, save_folder, 'WavPredictions', inp_name))
@@ -178,15 +203,15 @@ if __name__ == '__main__':
     data_dir = './Files'
 
     seed = 422
-    trainDense(data_dir=data_dir,
-               model_save_dir='../../TrainedModels',
-               save_folder='FFN',
-               ckpt_flag=True,
-               b_size=128,
-               learning_rate=0.001,
-               units=[32, 32],
-               epochs=100,
-               loss_type='mse',
-               w_length=1,
-               act='tanh',
-               inference=False)
+    trainLSTM(data_dir=data_dir,
+              model_save_dir='../TrainedModels',
+              save_folder='LSTM',
+              ckpt_flag=True,
+              b_size=128,
+              units=[32, 32],
+              learning_rate=0.001,
+              epochs=100,
+              loss_type='mse',
+              w_length=1,
+              act='tanh',
+              inference=False)
