@@ -1,12 +1,10 @@
-# DEEP LEARNING CONDITIONED MODELING OF OPTICAL COMPRESSION
-
 The complete set of audio examples and figures, together with the dataset and the source code developed for this study are available in this repository.
 
-Dataset link : https://doi.org/10.5281/zenodo.6497085
+# DEEP LEARNING CONDITIONED MODELING OF OPTICAL COMPRESSION
+
+Dataset link (2 parameters only): https://doi.org/10.5281/zenodo.6497085
 
 
 # FULLY CONDITIONED BLACK BOX MODEL FOR COMPRESSION
 
-The complete set of audio examples and figures, together with the dataset and the source code developed for this study are available in this repository.
-
-Dataset link : https://doi.org/10.34740/kaggle/dsv/5330581
+Dataset link (complete): https://doi.org/10.34740/kaggle/dsv/5330581
