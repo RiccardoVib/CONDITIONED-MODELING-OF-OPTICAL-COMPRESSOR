@@ -1,4 +1,4 @@
-# LA2A Audio Samples\
+# LA2A Audio Samples
 \
 Model: \
 input (2w): 32\
