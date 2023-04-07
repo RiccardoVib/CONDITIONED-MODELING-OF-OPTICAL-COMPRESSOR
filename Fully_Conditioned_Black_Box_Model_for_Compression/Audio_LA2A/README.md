@@ -3,4 +3,4 @@
 Model: \
 input (2w): 32\
 units: 64\
-epochs: 50\
+epochs: 50
