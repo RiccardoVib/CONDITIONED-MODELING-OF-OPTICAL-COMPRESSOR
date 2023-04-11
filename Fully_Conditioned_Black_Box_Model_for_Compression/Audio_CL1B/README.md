@@ -8,7 +8,7 @@ epochs: 50
 at = attack time\
 re = release time\
 ra = ratio\
-th = threshold\
+th = threshold
 
 Values are normalize between 0 and 1
 
