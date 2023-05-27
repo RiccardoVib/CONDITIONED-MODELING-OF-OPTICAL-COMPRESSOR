@@ -11,4 +11,4 @@ Dataset link (complete): https://doi.org/10.34740/kaggle/dsv/5330581
 
 # Demo: (WIP)
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/RiccardoVib/ResultsWebPage/HEAD?urlpath=%2Fvoila%2Frender%2FED.ipynb)
+https://stefanofasciani.com/2023/05/26/fully-conditioned-and-low-latency-black-box-modeling-of-analog-compression/
