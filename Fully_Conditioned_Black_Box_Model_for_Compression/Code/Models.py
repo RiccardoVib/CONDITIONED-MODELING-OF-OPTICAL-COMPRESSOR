@@ -103,7 +103,7 @@ def create_model_TCN(cond_dim, input_dim, units, ker, dilation=2):
     outputs = Multiply()([outputs, tf.expand_dims(g, axis=-1)])
     outputs = Add()([outputs, tf.expand_dims(b, axis=-1)])
     res = Conv1D(1, 1, name='Conv_res_4')(inputs)
-    outputs = ReLU()(outputs + res[:, C:, :])[:, :, 0]
+    outputs = ReLU()(outputs + res[:, C:, :])
 
     # outputs = Dense(T, name='outLay')(outputs)
 
@@ -113,7 +113,7 @@ def create_model_TCN(cond_dim, input_dim, units, ker, dilation=2):
 
 
 if __name__ == '__main__':
-    # model = create_model_LSTM_CNN(4, 16, 64)
+    
     #model = create_model_ED_CNN(4, 16, 96)
     model = create_model_TCN(4, 32, 42, 3)
     #model = create_model_TCN(2, 65536, 1, 13, dilation=10)
