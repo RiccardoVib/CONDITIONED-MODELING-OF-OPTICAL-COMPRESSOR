@@ -18,6 +18,6 @@
  
 [U-he Presswerk Dataset (4 parameters)](https://doi.org/10.34740/kaggle/dsv/6118202)
  
-[Softube FET Dataset (4 parameters)](https://????)
+[Softube FET Dataset (4 parameters)](https://doi.org/10.34740/kaggle/dsv/6119102)
  
 [LA-2A Dataset (2 parameters)](https://zenodo.org/record/3824876)
