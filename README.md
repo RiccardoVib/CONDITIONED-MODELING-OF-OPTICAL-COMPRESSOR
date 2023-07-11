@@ -14,9 +14,9 @@
 [CL 1B Dataset (4 parameters)](https://doi.org/10.34740/kaggle/dsv/5330581)
  
  
-[PSP MicroComp Dataset (4 parameters)](https://????)
+[PSP MicroComp Dataset (4 parameters)](https://doi.org/10.34740/kaggle/dsv/6118717)
  
-[U-he Presswerk Dataset (4 parameters)](https://???)
+[U-he Presswerk Dataset (4 parameters)](https://doi.org/10.34740/kaggle/dsv/6118202)
  
 [Softube FET Dataset (4 parameters)](https://????)
  
