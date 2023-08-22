@@ -43,7 +43,7 @@ def create_model_ED_CNN(cond_dim, input_dim, units, activation='sigmoid', drop=0
 
 
 
-def create_model_TCN(cond_dim, input_dim, units, ker, dilation=2):
+def create_model_TCN(cond_dim, input_dim, out, units, ker, dilation=2):
     T = input_dim  # time window
     D = cond_dim  # features
 
@@ -105,7 +105,7 @@ def create_model_TCN(cond_dim, input_dim, units, ker, dilation=2):
     res = Conv1D(1, 1, name='Conv_res_4')(inputs)
     outputs = ReLU()(outputs + res[:, C:, :])
 
-    # outputs = Dense(T, name='outLay')(outputs)
+    outputs = Conv1D(out, 1)(outputs)
 
     model = Model([cond_inputs, inputs], outputs)
     model.summary()
@@ -116,4 +116,4 @@ if __name__ == '__main__':
     
     #model = create_model_ED_CNN(4, 16, 96)
     model = create_model_TCN(4, 32, 42, 3)
-    #model = create_model_TCN(2, 65536, 1, 13, dilation=10)
+    #model = create_model_TCN(2, 65536, 1, 32, 13, dilation=10)
