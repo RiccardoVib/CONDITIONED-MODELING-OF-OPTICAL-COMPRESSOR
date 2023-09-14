@@ -1,30 +1,42 @@
+# Copyright (C) 2023 Riccardo Simionato, University of Oslo
+# Inquiries: riccardo.simionato.vib@gmail.com.com
+#
+# This code is free software: you can redistribute it and/or modify it under the terms
+# of the GNU Lesser General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Less General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License along with this code.
+# If not, see <http://www.gnu.org/licenses/>.
+#
+# If you use this code or any part of it in any program or publication, please acknowledge
+# its authors by adding a reference to this publication:
+#
+# R. Simionato, 2023, "Fully Conditioned Black Box Model for Compression" in proceedings of the 23th Digital Audio Effect Conference, Copenaghen, Denmark.
+
+
+
 import os
 import tensorflow as tf
 from UtilsForTrainings import plotTraining, writeResults, checkpoints, predictWaves
 import pickle
 
-from Models import create_model_ED_CNN, create_model_ED_CNN_new
-from DatasetsClass import DataGeneratorCL1B
+from Models import create_model_ED_CNN
+from DatasetsClass import DataGeneratorCL1B, DataGeneratorLA2A
 from LossFunctions import STFT
 from GetData_test import get_test_data
 import numpy as np
 import random
-#
-from tensorflow.compat.v1 import ConfigProto
-from tensorflow.compat.v1 import InteractiveSession
-
-
-config = ConfigProto()
-config.gpu_options.allow_growth = True
-session = InteractiveSession(config=config)
-
-
     
 def train(data_dir, epochs, seed=422, **kwargs):
     ckpt_flag = kwargs.get('ckpt_flag', False)
     b_size = kwargs.get('b_size', 32)
     learning_rate = kwargs.get('learning_rate', 0.0001)
     units = kwargs.get('units', 64)
+    d = kwargs.get('cond', 4)
     model_save_dir = kwargs.get('model_save_dir', '/scratch/users/riccarsi/TrainedModels')
     save_folder = kwargs.get('save_folder', 'ED_Testing')
     w_length = kwargs.get('w_length', 16)
@@ -42,29 +54,12 @@ def train(data_dir, epochs, seed=422, **kwargs):
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
     T = w_length  # time window
-    D = 4  # features
+    D = d  # features
     o = out
 
-    batch_numbers = b_size * (480000 - 2 * T) // o
-
-    model = create_model_ED_CNN_new(D, T, T, o, units, activation, batch_numbers)
-
-    lossesName = ["OutLay", 'OutLay', 'tf.math.abs']
-    losses = {
-        lossesName[0]: STFT(m=[512, 1204, 2048]),
-        lossesName[1]: 'mse',
-        lossesName[2]: 'mse',
-    }
-    lossWeights = {lossesName[0]: 1., lossesName[1]: 1., lossesName[2]: 1.}
-
-    #initial_learning_rate = 1e-4
-    #min_learning_rate = 1e-6
-    #decay_rate = tf.constant(0.9999,  dtype=tf.float32)
-    #schedule = CustomLRSchedule(initial_learning_rate=initial_learning_rate, decay_rate=decay_rate, min_learning_rate=min_learning_rate)
-
+    model = create_model_ED_CNN(D, T, T, o, units, activation)
     opt = tf.keras.optimizers.Adam(learning_rate=learning_rate, clipnorm=1)
 
-    #model.compile(loss=losses, loss_weights=lossWeights, metrics=['mse'], optimizer=opt)
     model.compile(loss='mse', metrics=['mse', 'mae'], optimizer=opt)
 
     callbacks = []
@@ -82,10 +77,10 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
     w = w_length
     if not inference:
-        #CL1B_train_data
-        train_gen = DataGeneratorCL1B("TubeTech_train_reduced_test.pickle", data_dir, input_enc_size=w_length, input_dec_size=w_length, output_size=o, cond_size=D, window=w_length, batch_size=b_size)
-        #CL1B_val_data
-        val_gen = DataGeneratorCL1B("TubeTech_train_reduced_test.pickle", data_dir, input_enc_size=w_length, input_dec_size=w_length, output_size=o, cond_size=D, window=w_length, batch_size=b_size)
+        #train_data
+        train_gen = DataGeneratorCL1B("TubeTech_train.pickle", data_dir, input_enc_size=w_length, input_dec_size=w_length, output_size=o, cond_size=D, window=w_length, batch_size=b_size)
+        #val_data
+        val_gen = DataGeneratorCL1B("TubeTech_val.pickle", data_dir, input_enc_size=w_length, input_dec_size=w_length, output_size=o, cond_size=D, window=w_length, batch_size=b_size)
 
         results = model.fit(train_gen, batch_size=b_size, epochs=epochs, verbose=0, validation_data=val_gen, callbacks=callbacks)
 
@@ -98,13 +93,13 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
         print("Training done")
 
-    X, Y, Z, RMS = get_test_data(data_dir=data_dir, w=w_length, output_size=o, seed=seed)
+    X, Y, Z = get_test_data(data_dir=data_dir, w=w_length, output_size=o, seed=seed)
     if ckpt_flag:
         best = tf.train.latest_checkpoint(ckpt_dir)
         if best is not None:
             print("Restored weights from {}".format(ckpt_dir))
             model.load_weights(best)
-    test_gen = DataGeneratorCL1B("TubeTech_train_reduced_test.pickle", data_dir, input_enc_size=w_length, input_dec_size=w_length, output_size=o, cond_size=D, window=w_length, batch_size=b_size)
+    test_gen = DataGeneratorCL1B("TubeTech_test.pickle", data_dir, input_enc_size=w_length, input_dec_size=w_length, output_size=o, cond_size=D, window=w_length, batch_size=b_size)
 
     test_loss = model.evaluate(test_gen, batch_size=b_size, verbose=0, return_dict=True)
 
@@ -131,13 +126,14 @@ if __name__ == '__main__':
 
     train(data_dir=data_dir,
             model_save_dir='../../TrainedModels',
-            save_folder='ED2_',
+            save_folder='ED',
             ckpt_flag=True,
             b_size=1,
             learning_rate=0.0001,
-            units=16,
+            units=32,
             epochs=10,
             activation='sigmoid',
-            w_length=64,
-            out=64,
+            w_length=16,
+            out=16,
+            cond=4,
             inference=False)
