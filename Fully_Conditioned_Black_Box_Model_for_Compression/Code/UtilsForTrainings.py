@@ -1,24 +1,3 @@
-# Copyright (C) 2023 Riccardo Simionato, University of Oslo
-# Inquiries: riccardo.simionato.vib@gmail.com.com
-#
-# This code is free software: you can redistribute it and/or modify it under the terms
-# of the GNU Lesser General Public License as published by the Free Software Foundation,
-# either version 3 of the License, or (at your option) any later version.
-#
-# This code is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the GNU Less General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License along with this code.
-# If not, see <http://www.gnu.org/licenses/>.
-#
-# If you use this code or any part of it in any program or publication, please acknowledge
-# its authors by adding a reference to this publication:
-#
-# R. Simionato, 2023, "Fully Conditioned Black Box Model for Compression" in proceedings of the 23th Digital Audio Effect Conference, Copenaghen, Denmark.
-
-
-
 import numpy as np
 import os
 import tensorflow as tf
@@ -28,7 +7,50 @@ from librosa import display
 from scipy.io import wavfile
 
 
-def writeResults(test_loss, results, b_size, learning_rate, loss_type, model_save_dir, save_folder,
+# class VASchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
+#     def __init__(self, initial_learning_rate):
+#         super(VASchedule, self).__init__()
+#         self.initial_learning_rate = initial_learning_rate
+#         #self.decay_steps = decay_steps
+#         #self.decay_rate = decay_rate
+#         #self.min_learning_rate = min_learning_rate
+#
+#     def __call__(self, step):
+#         initial_learning_rate = tf.cast(self.initial_learning_rate, tf.float32)
+#         #decay_steps = tf.cast(self.decay_steps, tf.float32)
+#         #decay_rate = tf.cast(self.decay_rate, tf.float32)
+#         #global_step = tf.cast(step, tf.float32)
+#
+#         learning_rate = initial_learning_rate / (1 + decay_rate * (global_step / decay_steps))
+#         return tf.maximum(learning_rate, self.min_learning_rate)
+#
+#     def get_config(self):
+#         return {
+#             "initial_learning_rate": self.initial_learning_rate,
+#             "decay_steps": self.decay_steps,
+#             "decay_rate": self.decay_rate,
+#             "min_learning_rate": self.min_learning_rate,
+#         }
+
+class CustomLRSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
+    def __init__(self, initial_learning_rate, min_learning_rate, decay_rate):
+        super(CustomLRSchedule, self).__init__()
+        self.initial_learning_rate = initial_learning_rate
+        self.min_learning_rate = min_learning_rate
+        self.decay_rate = decay_rate
+
+    def __call__(self, step):
+        return tf.maximum(self.initial_learning_rate * tf.math.pow(self.decay_rate, step), self.min_learning_rate)
+
+    def get_config(self):
+        config = {
+            "initial_learning_rate": self.initial_learning_rate,
+            "min_learning_rate": self.min_learning_rate,
+            "decay_rate": self.decay_rate,
+        }
+        return config
+    
+def writeResults(test_loss, results, b_size, learning_rate, model_save_dir, save_folder,
                  index):
     results = {
         'Test_Loss': test_loss,
@@ -36,7 +58,6 @@ def writeResults(test_loss, results, b_size, learning_rate, loss_type, model_sav
         'Min_train_loss': np.min(results.history['loss']),
         'b_size': b_size,
         'learning_rate': learning_rate,
-        'loss_type': loss_type,
         # 'Train_loss': results.history['loss'],
         'Val_loss': results.history['val_loss']
     }
@@ -48,16 +69,16 @@ def writeResults(test_loss, results, b_size, learning_rate, loss_type, model_sav
                          'wb'))
 
 
-def plotResult(predictions, x, y, save_folder):
+def plotResult(predictions, y, model_save_dir, save_folder):
     fig, ax = plt.subplots(nrows=1, ncols=1)
     # ax.plot(predictions, label='pred')
     # ax.plot(x, label='inp')
     # ax.plot(y, label='tar')
-    display.waveshow(y, sr=44100, ax=ax, label='Target', alpha=0.9)
-    display.waveshow(predictions, sr=44100, ax=ax, label='Prediction', alpha=0.7)
+    display.waveshow(y, sr=48000, ax=ax, label='Target', alpha=0.9)
+    display.waveshow(predictions, sr=48000, ax=ax, label='Prediction', alpha=0.7)
     # ax.label_outer()
     ax.legend(loc='upper right')
-    fig.savefig('../../TrainedModels/' + save_folder + '/plot')
+    fig.savefig(model_save_dir + '/' + save_folder + '/plot')
     plt.close('all')
 
 
@@ -73,7 +94,7 @@ def plotTraining(loss_training, loss_val, model_save_dir, save_folder):
     plt.close('all')
 
 
-def predictWaves(predictions, x_test, y_test, model_save_dir, save_folder, T):
+def predictWaves(predictions, x_test, y_test, model_save_dir, save_folder, fs):
     pred_name = '_pred.wav'
     inp_name = '_inp.wav'
     tar_name = '_tar.wav'
@@ -85,11 +106,12 @@ def predictWaves(predictions, x_test, y_test, model_save_dir, save_folder, T):
     if not os.path.exists(os.path.dirname(pred_dir)):
         os.makedirs(os.path.dirname(pred_dir))
 
-    wavfile.write(pred_dir, 48000, predictions.reshape(-1))
-    wavfile.write(inp_dir, 48000, x_test[:, T:].reshape(-1))
-    wavfile.write(tar_dir, 48000, y_test[:, T:].reshape(-1))
+    wavfile.write(pred_dir, fs, predictions.reshape(-1))
+    wavfile.write(inp_dir, fs, x_test.reshape(-1))
+    wavfile.write(tar_dir, fs, y_test.reshape(-1))
 
-    plotResult(predictions.reshape(-1), x_test[:, T:], y_test[:, T:].reshape(-1), save_folder)
+    plotResult(predictions.reshape(-1), y_test.reshape(-1), model_save_dir, save_folder)
+
 
 def checkpoints(model_save_dir, save_folder):
     ckpt_path = os.path.normpath(os.path.join(model_save_dir, save_folder, 'Checkpoints', 'best', 'best.ckpt'))
