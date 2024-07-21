@@ -7,8 +7,8 @@
  
 # FULLY CONDITIONED AND LOW LATENCY BLACK-BOX MODEL OF ANALOG COMPRESSION COMPRESSION
  
-### [Audio examples](https://stefanofasciani.com/2023/05/26/fully-conditioned-and-low-latency-black-box-modeling-of-analog-compression/)
-[Other examples][(https://uio-my.sharepoint.com/:f:/g/personal/riccarsi_uio_no/EhtRFmimB7hNt0LDxG9h44UBjuGRsAZpXzqD-W-X2coWEQ?e=pAb6Zh)](https://riccardovib.github.io/OpticalCompressor_pages/)
+[Audio examples](https://riccardovib.github.io/OpticalCompressor_pages/)
+
 ### Datasets:
  
 [CL 1B Dataset (4 parameters)](https://doi.org/10.34740/kaggle/dsv/5330581)
