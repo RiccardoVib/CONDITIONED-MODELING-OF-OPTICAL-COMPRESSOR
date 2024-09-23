@@ -10,7 +10,7 @@ from scipy.io import wavfile
 
 def writeResults(test_loss, results, b_size, learning_rate, model_save_dir, save_folder,
                  index):
-"""
+  """
     write to a text the result and parameters of the training
       :param test_loss: test loss [float]
       :param results: the results from the fit function [dictionary]
