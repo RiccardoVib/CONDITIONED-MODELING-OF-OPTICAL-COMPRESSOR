@@ -45,7 +45,6 @@ def trainDense(data_dir, epochs, seed=422, **kwargs):
 
     """
     
-    ckpt_flag = kwargs.get('ckpt_flag', False)
     b_size = kwargs.get('b_size', 128)
     learning_rate = kwargs.get('learning_rate', 0.001)
     units = kwargs.get('units', [32, 32])
@@ -212,9 +211,8 @@ def trainDense(data_dir, epochs, seed=422, **kwargs):
 
 
 if __name__ == '__main__':
-    data_dir = './Files'
-
-    seed = 422
+    data_dir = './Files' # data folder to dataset
+    seed = 422 # seed in case reproducibility is desired
     trainDense(data_dir=data_dir,
                model_save_dir='../../TrainedModels',
                save_folder='FFN',
