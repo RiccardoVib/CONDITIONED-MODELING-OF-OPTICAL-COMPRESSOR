@@ -26,7 +26,7 @@ import tensorflow as tf
 
 class DataGeneratorCL1B(Sequence):
 
-    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, window, shuffle=False, batch_size=10):
+    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False, batch_size=10):
         """
         Initializes a data generator object
           :param filename: name of the dataset
@@ -35,7 +35,6 @@ class DataGeneratorCL1B(Sequence):
           :param input_dec_size: decoder input size
           :param output_size: output size
           :param cond_size: number of conditioning parameters
-          :param window: total input size
           :param shuffle: shuffle the data after each epoch
           :param batch_size: The size of each batch returned by __getitem__
         """
@@ -53,7 +52,7 @@ class DataGeneratorCL1B(Sequence):
         self.input_dec_size = input_dec_size
         self.output_size = output_size
         self.cond_size = cond_size
-        self.w = window
+        self.w = input_enc_size + input_dec_size
         self.shuffle = shuffle
         self.batch_size = batch_size
         self.on_epoch_end()
@@ -100,7 +99,7 @@ class DataGeneratorCL1B(Sequence):
     
 class DataGeneratorLA2A(Sequence):
 
-    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, window, shuffle=False, batch_size=10):
+    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False, batch_size=10):
           """
         Initializes a data generator object
           :param filename: name of the dataset
@@ -109,7 +108,6 @@ class DataGeneratorLA2A(Sequence):
           :param input_dec_size: decoder input size
           :param output_size: output size
           :param cond_size: number of conditioning parameters
-          :param window: total input size
           :param shuffle: shuffle the data after each epoch
           :param batch_size: The size of each batch returned by __getitem__
         """
@@ -141,7 +139,7 @@ class DataGeneratorLA2A(Sequence):
         self.input_dec_size = input_dec_size
         self.output_size = output_size
         self.cond_size = cond_size
-        self.w = window
+        self.w = input_enc_size + input_dec_size
         self.shuffle = shuffle
         self.batch_size = batch_size
         self.on_epoch_end()
