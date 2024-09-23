@@ -22,12 +22,15 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 
 def time_loss(y_true, y_pred):
+    """ mean squared error """
     return tf.keras.metrics.mean_squared_error(y_true, y_pred)
 
 def freq_loss(y_true, y_pred):
+    """ multi-STFT error """
     return STFT_loss(y_true, y_pred)
 
 def ESR_loss(y_true, y_pred):
+    """ error to signal ratio """
     return tf.divide(K.sum(K.square(y_pred - y_true)), K.sum(K.square(y_true)))
 
 def DCLoss(y_true, y_pred):
@@ -35,6 +38,7 @@ def DCLoss(y_true, y_pred):
 
 
 def STFT_loss(y_true, y_pred):
+    """ multi-STFT error """
     m = [8, 16, 32]
     loss = 0
     for i in range(len(m)):
