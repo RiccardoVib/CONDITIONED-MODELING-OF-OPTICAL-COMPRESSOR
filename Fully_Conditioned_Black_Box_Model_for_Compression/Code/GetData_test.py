@@ -85,7 +85,3 @@ def get_test_data_la2a(data_dir, w, output_size, seed=422):
     Z = np.array(Z, dtype=np.float32)
 
     return X, Y, Z
-
-if __name__ == '__main__':
-    data_dir = '../../Files'
-
