@@ -2,11 +2,8 @@ import os
 
 import numpy as np
 import tensorflow as tf
-from LossFunctions import time_loss, freq_loss
-from GetData_final import get_data, get_test_data
 from tensorflow.keras.layers import Input, Dense, LSTM, Add, Conv1D, BatchNormalization, PReLU, Multiply, ReLU
 from tensorflow.keras.models import Model
-from UtilsForTrainings import plotTraining, writeResults, checkpoints, predictWaves
 import pickle
 from scipy import signal
 
@@ -110,10 +107,3 @@ def create_model_TCN(cond_dim, input_dim, out, units, ker, dilation=2):
     model = Model([cond_inputs, inputs], outputs)
     model.summary()
     return model
-
-
-if __name__ == '__main__':
-    
-    #model = create_model_ED_CNN(4, 16, 96)
-    model = create_model_TCN(4, 32, 42, 3)
-    #model = create_model_TCN(2, 65536, 1, 32, 13, dilation=10)
