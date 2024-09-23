@@ -71,9 +71,9 @@ def train(data_dir, epochs, seed=422, **kwargs):
         
   
     # create the model
-    model = create_model_ED_CNN(D, T, T, o, units, activation)
+    model = create_model_ED_CNN(D, T, units, activation)
     # define the Adam optimizer with the initial learning rate
-    opt = tf.keras.optimizers.Adam(learning_rate=learning_rate, clipnorm=1)
+    opt = tf.keras.optimizers.legacy.Adam(learning_rate=learning_rate, clipnorm=1)
     # compile the model
     model.compile(loss='mse', metrics=['mse', 'mae'], optimizer=opt)
 
@@ -139,12 +139,12 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
 
 if __name__ == '__main__':
-    data_dir = './Files' # data folder to dataset
+    data_dir = '../Files' # data folder to dataset
     seed = 422 # seed in case reproducibility is desired
 
     train(data_dir=data_dir,
-            model_save_dir='../../TrainedModels',
-            save_folder='ED',
+            model_save_dir='../Models/',
+            save_folder='CL 1B Model',
             ckpt_flag=True,
             b_size=1,
             learning_rate=0.0001,
