@@ -23,8 +23,13 @@ import os
 import numpy as np
 import tensorflow as tf
 
-def get_test_data(data_dir, w, output_size, seed=422):
-    os.environ['PYTHONHASHSEED'] = str(seed)
+def get_test_data(data_dir, w, output_size):
+    """
+        load the test data
+          :param data_dir: the directory in which data are stored
+          :param w: the input size
+          :param output_size: the output size
+    """
 
     file_data = open(os.path.normpath('/'.join([data_dir, 'TubeTech_train_reduced_test.pickle'])), 'rb')
 
@@ -55,8 +60,13 @@ def get_test_data(data_dir, w, output_size, seed=422):
     return X, Y, Z
 
 
-def get_test_data_la2a(data_dir, w, output_size, seed=422):
-    os.environ['PYTHONHASHSEED'] = str(seed)
+def get_test_data_la2a(data_dir, w, output_size):
+    """
+        load the test data
+          :param data_dir: the directory in which data are stored
+          :param w: the input size
+          :param output_size: the output size
+    """
 
     file_data = open(os.path.normpath('/'.join([data_dir, 'LA2A_test_data.pickle'])), 'rb')
 
