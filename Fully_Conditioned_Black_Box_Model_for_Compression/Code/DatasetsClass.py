@@ -22,7 +22,6 @@ import pickle
 import os
 import numpy as np
 from tensorflow.keras.utils import Sequence
-import tensorflow as tf
 
 class DataGeneratorCL1B(Sequence):
 

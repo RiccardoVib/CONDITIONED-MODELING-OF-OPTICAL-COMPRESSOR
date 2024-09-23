@@ -22,14 +22,11 @@
 import os
 import tensorflow as tf
 from UtilsForTrainings import plotTraining, writeResults, checkpoints, predictWaves
-import pickle
-
 from Models import create_model_ED_CNN
 from DatasetsClass import DataGeneratorCL1B, DataGeneratorLA2A
-from LossFunctions import STFT_loss
 import numpy as np
 import random
-    
+
 def train(data_dir, epochs, seed=422, **kwargs):
     """
       :param data_dir: the directory in which dataset are stored [string]
@@ -94,9 +91,9 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
     if not inference:
         #train_data
-        train_gen = DataGeneratorCL1B("TubeTech_train.pickle", data_dir, input_enc_size=T, input_dec_size=T, output_size=o, cond_size=D, batch_size=b_size)
+        train_gen = DataGeneratorCL1B("TubeTech_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
         #val_data
-        val_gen = DataGeneratorCL1B("TubeTech_val.pickle", data_dir, input_enc_size=T, input_dec_size=T, output_size=o, cond_size=D, batch_size=b_size)
+        val_gen = DataGeneratorCL1B("TubeTech_val.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
 
         results = model.fit(train_gen, batch_size=b_size, epochs=epochs, verbose=0, validation_data=val_gen, callbacks=callbacks)
 
@@ -118,7 +115,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
         # if no weights are found, there is something wrong
         print("Something is wrong.")
         
-    test_gen = DataGeneratorCL1B("TubeTech_test.pickle", data_dir, input_enc_size=T, input_dec_size=T, output_size=o, cond_size=D, batch_size=b_size)
+    test_gen = DataGeneratorCL1B("TubeTech_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
 
     # compute test loss
     test_loss = model.evaluate(test_gen, batch_size=b_size, verbose=0, return_dict=True)
@@ -151,7 +148,7 @@ if __name__ == '__main__':
             units=64,
             epochs=10,
             activation='sigmoid',
-            w_length=16,
+            w_length=32,
             out=16,
             cond=4,
             inference=False)
