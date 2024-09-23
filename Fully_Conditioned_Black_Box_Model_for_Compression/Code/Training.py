@@ -27,7 +27,6 @@ import pickle
 from Models import create_model_ED_CNN
 from DatasetsClass import DataGeneratorCL1B, DataGeneratorLA2A
 from LossFunctions import STFT
-from GetData_test import get_test_data
 import numpy as np
 import random
     
