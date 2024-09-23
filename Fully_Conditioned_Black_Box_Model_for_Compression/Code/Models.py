@@ -1,16 +1,17 @@
 import os
-
 import numpy as np
 import tensorflow as tf
+from LossFunctions import time_loss, freq_loss
 from tensorflow.keras.layers import Input, Dense, LSTM, Add, Conv1D, BatchNormalization, PReLU, Multiply, ReLU
 from tensorflow.keras.models import Model
+from UtilsForTrainings import plotTraining, writeResults, checkpoints, predictWaves
 import pickle
 from scipy import signal
 
 
-def create_model_ED_CNN(cond_dim, input_dim, units, activation='sigmoid', drop=0.):
+def create_model_ED_CNN(cond_dim, input_dim, units, activation='sigmoid'):
     D = cond_dim
-    T = input_dim
+    T = input_dim//2
     cond_inputs = Input(shape=(D), name='enc_cond')
     encoder_inputs = Input(shape=(T, 1), name='enc_input')
 
@@ -27,8 +28,7 @@ def create_model_ED_CNN(cond_dim, input_dim, units, activation='sigmoid', drop=0
 
     decoder_inputs = Input(shape=(T, 1), name='dec_input')
 
-    outputs = LSTM(units, return_sequences=False, return_state=False, name='LSTM_De',
-                   dropout=drop)(decoder_inputs, initial_state=encoder_states)
+    outputs = LSTM(units, return_sequences=False, return_state=False, name='LSTM_De')(decoder_inputs, initial_state=encoder_states)
 
     decoder_outputs = Dense(units, activation=activation, name='DenseLay')(outputs)
 
