@@ -168,10 +168,6 @@ def trainLSTM(data_dir, epochs, seed=422, **kwargs):
             'learning_rate': learning_rate,
             'opt_type': opt_type,
             'loss_type': loss_type,
-            'layers_enc': layers_enc,
-            'layers_dec': layers_dec,
-            'n_units_enc': n_units_enc,
-            'n_units_dec': n_units_dec,
             'w_length': w_length,
             # 'Train_loss': results.history['loss'],
             'Val_loss': results.history['val_loss']
@@ -194,7 +190,7 @@ def trainLSTM(data_dir, epochs, seed=422, **kwargs):
         print('GenerateWavLoss: ', model.evaluate(x_test, y_test, batch_size=b_size, verbose=0))
         predictions = scaler[0].inverse_transform(predictions)
         x_test = scaler[0].inverse_transform(x_test[:, :, 0])
-        y_gen = scaler[0].inverse_transform(y_test)
+        y_test = scaler[0].inverse_transform(y_test)
 
         predictions = predictions.reshape(-1)
         x_test = x_test.reshape(-1)

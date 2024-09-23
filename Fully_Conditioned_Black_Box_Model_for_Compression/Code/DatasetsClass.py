@@ -22,7 +22,6 @@ import pickle
 import os
 import numpy as np
 from tensorflow.keras.utils import Sequence
-import tensorflow as tf
 
 class DataGeneratorCL1B(Sequence):
 
@@ -100,7 +99,7 @@ class DataGeneratorCL1B(Sequence):
 class DataGeneratorLA2A(Sequence):
 
     def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False, batch_size=10):
-          """
+        """
         Initializes a data generator object
           :param filename: name of the dataset
           :param data_dir: the directory in which data are stored
