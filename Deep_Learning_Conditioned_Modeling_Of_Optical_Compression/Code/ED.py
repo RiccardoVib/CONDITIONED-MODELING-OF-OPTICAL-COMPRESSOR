@@ -76,9 +76,6 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
     n_units_enc = n_units_enc[:-2]
     n_units_dec = n_units_dec[:-2]
 
-    # load the test data
-    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference, scaler=scaler, seed=seed)
-
     # T past values used to predict the next value
     T = x.shape[1]  # time window
     D = x.shape[2]  # features
