@@ -29,8 +29,13 @@ class DataGeneratorCL1B(Sequence):
     def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, window, shuffle=False, batch_size=10):
         """
         Initializes a data generator object
+          :param filename: name of the dataset
           :param data_dir: the directory in which data are stored
+          :param input_enc_size: encoder input size
+          :param input_dec_size: decoder input size
           :param output_size: output size
+          :param cond_size: number of conditioning parameters
+          :param window: total input size
           :param shuffle: shuffle the data after each epoch
           :param batch_size: The size of each batch returned by __getitem__
         """
@@ -96,10 +101,15 @@ class DataGeneratorCL1B(Sequence):
 class DataGeneratorLA2A(Sequence):
 
     def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, window, shuffle=False, batch_size=10):
-        """
+          """
         Initializes a data generator object
+          :param filename: name of the dataset
           :param data_dir: the directory in which data are stored
+          :param input_enc_size: encoder input size
+          :param input_dec_size: decoder input size
           :param output_size: output size
+          :param cond_size: number of conditioning parameters
+          :param window: total input size
           :param shuffle: shuffle the data after each epoch
           :param batch_size: The size of each batch returned by __getitem__
         """
@@ -135,8 +145,6 @@ class DataGeneratorLA2A(Sequence):
         self.shuffle = shuffle
         self.batch_size = batch_size
         self.on_epoch_end()
-
-
 
     def on_epoch_end(self):
         self.indices = np.arange(self.x.shape[0])
