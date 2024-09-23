@@ -124,9 +124,9 @@ def train(data_dir, epochs, seed=422, **kwargs):
     test_loss = model.evaluate(test_gen, batch_size=b_size, verbose=0, return_dict=True)
 
     print('Test Loss: ', test_loss)
-    predictions = model.predict([Z, X[:, :w], X[:, w:]], batch_size=batch_numbers, verbose=0)
+    predictions = model.predict(test_gen, batch_size=b_size, verbose=0)
     # plot and render the output audio file, together with the input and target
-    predictWaves(predictions, X[:, -o:], Y, model_save_dir, save_folder, 48000)
+    predictWaves(predictions, test_gen.x.reshape(-1), test_gen.y.reshape(-1), model_save_dir, save_folder, 48000)
 
     results_ = {'Test_Loss': test_loss}
 
@@ -148,7 +148,7 @@ if __name__ == '__main__':
             ckpt_flag=True,
             b_size=1,
             learning_rate=0.0001,
-            units=32,
+            units=64,
             epochs=10,
             activation='sigmoid',
             w_length=16,
