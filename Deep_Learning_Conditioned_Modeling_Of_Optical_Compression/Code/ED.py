@@ -65,6 +65,7 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
     n_units_enc = n_units_enc[:-2]
     n_units_dec = n_units_dec[:-2]
 
+    # load the data
     x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference, scaler=scaler, seed=seed)
 
     # T past values used to predict the next value
@@ -115,51 +116,59 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
         model.compile(loss='mse', metrics=['mse'], optimizer=opt)
     else:
         raise ValueError('Please pass loss_type as either MAE or MSE')
-
-    # TODO: Currently not loading weights as we only save the best model... Should probably
+   
+    # define callbacks: where to store the weights
     callbacks = []
-    if ckpt_flag:
-        ckpt_path = os.path.normpath(os.path.join(model_save_dir, save_folder, 'Checkpoints', 'best', 'best.ckpt'))
-        ckpt_path_latest = os.path.normpath(
+    
+    ckpt_path = os.path.normpath(os.path.join(model_save_dir, save_folder, 'Checkpoints', 'best', 'best.ckpt'))
+    ckpt_path_latest = os.path.normpath(
             os.path.join(model_save_dir, save_folder, 'Checkpoints', 'latest', 'latest.ckpt'))
-        ckpt_dir = os.path.normpath(os.path.join(model_save_dir, save_folder, 'Checkpoints', 'best'))
-        ckpt_dir_latest = os.path.normpath(os.path.join(model_save_dir, save_folder, 'Checkpoints', 'latest'))
+    ckpt_dir = os.path.normpath(os.path.join(model_save_dir, save_folder, 'Checkpoints', 'best'))
+    ckpt_dir_latest = os.path.normpath(os.path.join(model_save_dir, save_folder, 'Checkpoints', 'latest'))
 
-        if not os.path.exists(os.path.dirname(ckpt_dir)):
-            os.makedirs(os.path.dirname(ckpt_dir))
-        if not os.path.exists(os.path.dirname(ckpt_dir_latest)):
-            os.makedirs(os.path.dirname(ckpt_dir_latest))
+    if not os.path.exists(os.path.dirname(ckpt_dir)):
+        os.makedirs(os.path.dirname(ckpt_dir))
+    if not os.path.exists(os.path.dirname(ckpt_dir_latest)):
+        os.makedirs(os.path.dirname(ckpt_dir_latest))
 
-        ckpt_callback = tf.keras.callbacks.ModelCheckpoint(filepath=ckpt_path, monitor='val_loss', mode='min',
+    ckpt_callback = tf.keras.callbacks.ModelCheckpoint(filepath=ckpt_path, monitor='val_loss', mode='min',
                                                            save_best_only=True, save_weights_only=True, verbose=1)
-        ckpt_callback_latest = tf.keras.callbacks.ModelCheckpoint(filepath=ckpt_path_latest, monitor='val_loss',
+    ckpt_callback_latest = tf.keras.callbacks.ModelCheckpoint(filepath=ckpt_path_latest, monitor='val_loss',
                                                                   mode='min',
                                                                   save_best_only=False, save_weights_only=True,
                                                                   verbose=1)
-        callbacks += [ckpt_callback, ckpt_callback_latest]
-        latest = tf.train.latest_checkpoint(ckpt_dir_latest)
-        if latest is not None:
-            print("Restored weights from {}".format(ckpt_dir))
-            model.load_weights(latest)
-            # start_epoch = int(latest.split('-')[-1].split('.')[0])
-            # print('Starting from epoch: ', start_epoch + 1)
-        else:
-            print("Initializing random weights.")
+    callbacks += [ckpt_callback, ckpt_callback_latest]
+
+    # load the weights of the last epoch, if any
+    last = tf.train.latest_checkpoint(ckpt_dir_latest)
+    if last is not None:
+        print("Restored weights from {}".format(ckpt_dir_latest))
+        model.load_weights(last)
+    else:
+        # if no weights are found,the weights are random generated
+        print("Initializing random weights.")
 
     early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', min_delta=0.000001, patience=20,
                                                                restore_best_weights=True, verbose=0)
     callbacks += [early_stopping_callback]
 
-    # train the RNN
+    # train the neural network
     if not inference:
         results = model.fit([x[:, :-1, :], x[:, -1, 0]], y[:, -1], batch_size=b_size, epochs=epochs, verbose=0,
                             validation_data=([x_val[:, :-1, :], x_val[:, -1, 0]], y_val[:, -1]),
                             callbacks=callbacks)
-    if ckpt_flag:
-        best = tf.train.latest_checkpoint(ckpt_dir)
-        if best is not None:
-            print("Restored weights from {}".format(ckpt_dir))
-            model.load_weights(best)
+    
+    
+    # load the best weights of the model
+    best = tf.train.latest_checkpoint(ckpt_dir)
+    if best is not None:
+        print("Restored weights from {}".format(ckpt_dir))
+        model.load_weights(best).expect_partial()
+    else:
+        # if no weights are found, there is something wrong
+        print("Something is wrong.")
+
+    # compute test loss
     test_loss = model.evaluate([x_test[:, :-1, :], x_test[:, -1, 0]], y_test[:, -1], batch_size=b_size, verbose=0)
     print('Test Loss: ', test_loss)
     if inference:
@@ -183,15 +192,17 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
         }
         print(results)
     if not inference:
-        if ckpt_flag:
-            with open(os.path.normpath('/'.join([model_save_dir, save_folder, 'results.txt'])), 'w') as f:
-                for key, value in results.items():
-                    print('\n', key, '  : ', value, file=f)
-                pickle.dump(results,
-                            open(os.path.normpath('/'.join([model_save_dir, save_folder, 'results.pkl'])), 'wb'))
+      
+        with open(os.path.normpath('/'.join([model_save_dir, save_folder, 'results.txt'])), 'w') as f:
+            for key, value in results.items():
+                print('\n', key, '  : ', value, file=f)
+            pickle.dump(results,
+                        open(os.path.normpath('/'.join([model_save_dir, save_folder, 'results.pkl'])), 'wb'))
 
     if inference:
 
+        # predict the test set and save the results
+        
         predictions = model.predict([x_test[:, :-1, :], x_test[:, -1, 0]])
         print('GenerateWavLoss: ',
               model.evaluate([x_test[:, :-1, :], x_test[:, -1, 0]], y_test[:, -1], batch_size=b_size, verbose=0))
@@ -224,8 +235,8 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
 
 
 if __name__ == '__main__':
-    data_dir = './Files'
-    seed = 422
+    data_dir = './Files' # data folder to dataset
+    seed = 422 # seed in case reproducibility is desired
     trainED(data_dir=data_dir,
               model_save_dir='../../TrainedModels',
               save_folder='ED',
