@@ -111,20 +111,10 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
     model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
     model.summary()
 
-    if opt_type == 'Adam':
-        opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
-    elif opt_type == 'SGD':
-        opt = tf.keras.optimizers.SGD(learning_rate=learning_rate)
-    else:
-        raise ValueError('Please pass opt_type as either Adam or SGD')
-
-    if loss_type == 'mae':
-        model.compile(loss='mae', metrics=['mae'], optimizer=opt)
-    elif loss_type == 'mse':
-        model.compile(loss='mse', metrics=['mse'], optimizer=opt)
-    else:
-        raise ValueError('Please pass loss_type as either MAE or MSE')
-   
+    # define the Adam optimizer with the initial learning rate, and compile the model
+    opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+    model.compile(loss='mse', metrics=['mse'], optimizer=opt)
+    
     # define callbacks: where to store the weights
     callbacks = []
     
