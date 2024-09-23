@@ -29,7 +29,19 @@ from tensorflow.keras.models import Model
 import pickle
 
 def trainED(data_dir, epochs, seed=422, **kwargs):
-    ckpt_flag = kwargs.get('ckpt_flag', False)
+    """
+      :param data_dir: the directory in which dataset are stored [string]
+      :param batch_size: the size of each batch [int]
+      :param learning_rate: the initial leanring rate [float]
+      :param encoder_units: the number of encoder's units [array of int]
+      :param decoder_units: the number of decoder's units [array of int]
+      :param model_save_dir: the directory in which models are stored [string]
+      :param save_folder: the directory in which the model will be saved [string]
+      :param inference: if True it skip the training and it compute only the inference [bool]
+      :param w_length: input size [int]
+      :param epochs: the number of epochs [int]
+    """
+
     b_size = kwargs.get('b_size', 128)
     learning_rate = kwargs.get('learning_rate', 0.001)
     encoder_units = kwargs.get('encoder_units', [64])
@@ -38,9 +50,7 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
         raise ValueError('Final encoder layer must same units as first decoder layer!')
     model_save_dir = kwargs.get('model_save_dir', '../../TrainedModels')
     save_folder = kwargs.get('save_folder', 'ED')
-    opt_type = kwargs.get('opt_type', 'Adam')
     inference = kwargs.get('inference', False)
-    loss_type = kwargs.get('loss_type', 'mse')
     w_length = kwargs.get('w_length', 16)
     scaler = None
 
@@ -48,6 +58,7 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
         file_scaler = open(os.path.normpath('/'.join([data_dir, 'scaler.pickle'])), 'rb')
         scaler = pickle.load(file_scaler)
 
+     # load the training data
     x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference,
                                                               scaler=scaler,
                                                               seed=seed)
@@ -65,7 +76,7 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
     n_units_enc = n_units_enc[:-2]
     n_units_dec = n_units_dec[:-2]
 
-    # load the data
+    # load the test data
     x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference, scaler=scaler, seed=seed)
 
     # T past values used to predict the next value
