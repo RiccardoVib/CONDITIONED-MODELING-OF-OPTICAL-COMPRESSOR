@@ -43,6 +43,11 @@ class DataGeneratorCL1B(Sequence):
         y = np.array(Z['y'], dtype=np.float32)
         z = np.array(Z['z'], dtype=np.float32)
 
+
+        x = x * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
+        y = y * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
+
+
         self.x = x
         self.y = y
         self.z = z
@@ -115,6 +120,8 @@ class DataGeneratorLA2A(Sequence):
         x = np.array(Z['x'], dtype=np.float32)
         y = np.array(Z['y'], dtype=np.float32)
         z = np.array(Z['z'], dtype=np.float32)
+        x = x * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
+        y = y * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
 
         length = x.shape[1]
 
