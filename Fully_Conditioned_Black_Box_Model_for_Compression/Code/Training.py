@@ -83,17 +83,17 @@ def train(data_dir, epochs, seed=422, **kwargs):
    
     ckpt_callback, ckpt_callback_latest, ckpt_dir, ckpt_dir_latest = checkpoints(model_save_dir, save_folder)
     callbacks += [ckpt_callback, ckpt_callback_latest]
-    
-    # load the best weights of the model
-    best = tf.train.latest_checkpoint(ckpt_dir)
-    if best is not None:
-        print("Restored weights from {}".format(ckpt_dir))
-        model.load_weights(best).expect_partial()
-    else:
-        # if no weights are found, there is something wrong
-        print("Something is wrong.")
 
     if not inference:
+        # load the weights of the model
+        last = tf.train.latest_checkpoint(ckpt_dir_latest)
+        if last is not None:
+            print("Restored weights from {}".format(ckpt_dir))
+            model.load_weights(last).expect_partial()
+        else:
+            # if no weights are found, they are initialized
+            print("Something is wrong.")
+
         #train_data
         train_gen = data_generator("TubeTech_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
         #val_data
@@ -141,6 +141,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
 if __name__ == '__main__':
     data_dir = '../Files' # data folder to dataset
+    data_dir = 'C:/Users/riccarsi/OneDrive - Universitetet i Oslo/Datasets/Compressors/DatasetOLD' # data folder to dataset
     seed = 422 # seed in case reproducibility is desired
 
     train(data_dir=data_dir,
@@ -155,4 +156,4 @@ if __name__ == '__main__':
             w_length=32,
             out=16,
             cond=4,
-            inference=False)
+            inference=True)

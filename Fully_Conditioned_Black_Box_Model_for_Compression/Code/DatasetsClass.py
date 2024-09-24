@@ -21,6 +21,7 @@
 import pickle
 import os
 import numpy as np
+from scipy.signal.windows import tukey
 from tensorflow.keras.utils import Sequence
 
 class DataGeneratorCL1B(Sequence):
@@ -39,9 +40,9 @@ class DataGeneratorCL1B(Sequence):
         """
         file_data = open(os.path.normpath('/'.join([data_dir, filename])), 'rb')
         Z = pickle.load(file_data)
-        x = np.array(Z['x'], dtype=np.float32)
-        y = np.array(Z['y'], dtype=np.float32)
-        z = np.array(Z['z'], dtype=np.float32)
+        x = np.array(Z['input'][:10], dtype=np.float32)
+        y = np.array(Z['target'][:10], dtype=np.float32)
+        z = np.array(Z['cond'][:10], dtype=np.float32)
 
 
         x = x * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
@@ -117,9 +118,9 @@ class DataGeneratorLA2A(Sequence):
         """
         file_data = open(os.path.normpath('/'.join([data_dir, filename])), 'rb')
         Z = pickle.load(file_data)
-        x = np.array(Z['x'], dtype=np.float32)
-        y = np.array(Z['y'], dtype=np.float32)
-        z = np.array(Z['z'], dtype=np.float32)
+        x = np.array(Z['input'], dtype=np.float32)
+        y = np.array(Z['target'], dtype=np.float32)
+        z = np.array(Z['cond'], dtype=np.float32)
         x = x * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
         y = y * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
 
