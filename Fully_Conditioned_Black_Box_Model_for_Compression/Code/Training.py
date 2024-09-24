@@ -53,6 +53,10 @@ def train(data_dir, epochs, seed=422, **kwargs):
     activation = kwargs.get('activation', 'sigmoid')
     o = kwargs.get('out', 16)
 
+    if D == 4:
+        data_generator = DataGeneratorCL1B
+    else:
+        data_generator = DataGeneratorLA2A
 
     # set all the seed in case reproducibility is desired
     #np.random.seed(422)
@@ -91,9 +95,9 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
     if not inference:
         #train_data
-        train_gen = DataGeneratorCL1B("TubeTech_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
+        train_gen = data_generator("TubeTech_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
         #val_data
-        val_gen = DataGeneratorCL1B("TubeTech_val.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
+        val_gen = data_generator("TubeTech_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
 
         results = model.fit(train_gen, batch_size=b_size, epochs=epochs, verbose=0, validation_data=val_gen, shuffle=False, callbacks=callbacks)
 
@@ -115,7 +119,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
         # if no weights are found, there is something wrong
         print("Something is wrong.")
         
-    test_gen = DataGeneratorCL1B("TubeTech_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
+    test_gen = data_generator("TubeTech_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
 
     # compute test loss
     test_loss = model.evaluate(test_gen, batch_size=b_size, verbose=0, return_dict=True)
