@@ -59,7 +59,7 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
         scaler = pickle.load(file_scaler)
 
      # load the training data
-    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference,
+    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, window=w_length, inference=inference,
                                                               scaler=scaler,
                                                               seed=seed)
 
@@ -84,12 +84,12 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
     first_unit_encoder = encoder_units.pop(0)
     if len(encoder_units) > 0:
         last_unit_encoder = encoder_units.pop()
-        outputs = LSTM(first_unit_encoder, return_sequences=True, name='LSTM_En0')(encoder_inputs)
+        outputs = LSTM(first_unit_encoder, return_sequences=True, stateful=True, name='LSTM_En0')(encoder_inputs)
         for i, unit in enumerate(encoder_units):
             outputs = LSTM(unit, return_sequences=True, name='LSTM_En' + str(i + 1))(outputs)
-        outputs, state_h, state_c = LSTM(last_unit_encoder, return_state=True, name='LSTM_EnFin')(outputs)
+        outputs, state_h, state_c = LSTM(last_unit_encoder, return_state=True,  stateful=True, name='LSTM_EnFin')(outputs)
     else:
-        outputs, state_h, state_c = LSTM(first_unit_encoder, return_state=True, name='LSTM_En')(encoder_inputs)
+        outputs, state_h, state_c = LSTM(first_unit_encoder, return_state=True,  stateful=True, name='LSTM_En')(encoder_inputs)
 
     encoder_states = [state_h, state_c]
 
@@ -97,13 +97,12 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
     first_unit_decoder = decoder_units.pop(0)
     if len(decoder_units) > 0:
         last_unit_decoder = decoder_units.pop()
-        outputs = LSTM(first_unit_decoder, return_sequences=True, name='LSTM_De0')(decoder_inputs,
-                                                                                                 initial_state=encoder_states)
+        outputs = LSTM(first_unit_decoder, return_sequences=True, name='LSTM_De0')(decoder_inputs, initial_state=encoder_states)
         for i, unit in enumerate(decoder_units):
             outputs = LSTM(unit, return_sequences=True, name='LSTM_De' + str(i + 1))(outputs)
-        outputs, _, _ = LSTM(last_unit_decoder, return_sequences=True, return_state=True, name='LSTM_DeFin')(outputs)
+        outputs, _, _ = LSTM(last_unit_decoder, return_sequences=True, return_state=True,  stateful=True, name='LSTM_DeFin')(outputs)
     else:
-        outputs, _, _ = LSTM(first_unit_decoder, return_sequences=True, return_state=True, name='LSTM_De')(
+        outputs, _, _ = LSTM(first_unit_decoder, return_sequences=True, return_state=True,  stateful=True, name='LSTM_De')(
             decoder_inputs,
             initial_state=encoder_states)
 
@@ -153,7 +152,7 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
     # train the neural network
     if not inference:
         results = model.fit([x[:, :-1, :], x[:, -1, 0]], y[:, -1], batch_size=b_size, epochs=epochs, verbose=0,
-                            validation_data=([x_val[:, :-1, :], x_val[:, -1, 0]], y_val[:, -1]),
+                            validation_data=([x_val[:, :-1, :], x_val[:, -1, 0]], y_val[:, -1]), shuffle=False,
                             callbacks=callbacks)
     
     

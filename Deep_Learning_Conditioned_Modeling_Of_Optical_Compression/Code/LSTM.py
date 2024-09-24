@@ -63,15 +63,13 @@ def trainLSTM(data_dir, epochs, seed=422, **kwargs):
         scaler = pickle.load(file_scaler)
         
     # load the data
-    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference, scaler=scaler,
+    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, window=w_length, inference=inference, scaler=scaler,
                                                                               seed=seed)
 
     layers = len(units)
     n_units = ''
     for unit in units:
         n_units += str(unit) + ', '
-
-    n_units = n_units[:-2]
 
     # T past values used to predict the next value
     T = x.shape[1]  # time window
@@ -81,12 +79,12 @@ def trainLSTM(data_dir, epochs, seed=422, **kwargs):
     first_unit_encoder = units.pop(0)
     if len(units) > 0:
         last_unit_encoder = units.pop()
-        outputs = LSTM(first_unit_encoder, return_sequences=True, name='LSTM_En0')(inputs)
+        outputs = LSTM(first_unit_encoder, return_sequences=True, stateful=True, name='LSTM_En0')(inputs)
         for i, unit in enumerate(units):
-            outputs, state_h, state_c = LSTM(unit, return_sequences=True, name='LSTM_En' + str(i + 1))(outputs)
-        outputs = LSTM(last_unit_encoder, name='LSTM_EnFin')(outputs)
+            outputs, state_h, state_c = LSTM(unit, return_sequences=True, stateful=True, name='LSTM_En' + str(i + 1))(outputs)
+        outputs = LSTM(last_unit_encoder, stateful=True, name='LSTM_EnFin')(outputs)
     else:
-        outputs = LSTM(first_unit_encoder, name='LSTM_En')(inputs)
+        outputs = LSTM(first_unit_encoder, stateful=True, name='LSTM_En')(inputs)
 
     outputs = Dense(1, activation=act, name='DenseLay')(outputs)
     model = Model(inputs, outputs)
@@ -142,7 +140,7 @@ def trainLSTM(data_dir, epochs, seed=422, **kwargs):
     # train
     if not inference:
         results = model.fit(x, y, batch_size=b_size, epochs=epochs, verbose=0,
-                            validation_data=(x_val, y_val),
+                            validation_data=(x_val, y_val), shuffle=False,
                             callbacks=callbacks)
 
      # load the best weights of the model

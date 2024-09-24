@@ -60,15 +60,12 @@ def trainDense(data_dir, epochs, seed=422, **kwargs):
         scaler = pickle.load(file_scaler)
 
     # load the data
-    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, w_length=w_length, inference=inference, scaler=scaler,
+    x, y, x_val, y_val, x_test, y_test, scaler, fs = get_data(data_dir=data_dir, window=w_length, inference=inference, scaler=scaler,
                                                                               seed=seed)
 
-    layers = len(units)
     n_units = ''
     for unit in units:
         n_units += str(unit) + ', '
-
-    n_units = n_units[:-2]
 
     # T past values used to predict the next value
     T = x.shape[1]  # time window
@@ -129,7 +126,7 @@ def trainDense(data_dir, epochs, seed=422, **kwargs):
     callbacks += [early_stopping_callback]
     # train
     if not inference:
-        results = model.fit(x, y, batch_size=b_size, epochs=epochs,
+        results = model.fit(x, y, batch_size=b_size, epochs=epochs, shuffle=False,
                             validation_data=(x_val, y_val), callbacks=callbacks, verbose=0)
     
     # load the best weights of the model

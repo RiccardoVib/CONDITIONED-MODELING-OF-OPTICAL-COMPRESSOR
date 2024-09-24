@@ -95,7 +95,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
         #val_data
         val_gen = DataGeneratorCL1B("TubeTech_val.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
 
-        results = model.fit(train_gen, batch_size=b_size, epochs=epochs, verbose=0, validation_data=val_gen, callbacks=callbacks)
+        results = model.fit(train_gen, batch_size=b_size, epochs=epochs, verbose=0, validation_data=val_gen, shuffle=False, callbacks=callbacks)
 
         writeResults(None, results, b_size, learning_rate, model_save_dir, save_folder, 0)
 
