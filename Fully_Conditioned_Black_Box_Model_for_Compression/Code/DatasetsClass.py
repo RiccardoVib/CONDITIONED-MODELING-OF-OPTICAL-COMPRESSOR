@@ -99,7 +99,9 @@ class DataGeneratorCL1B(Sequence):
         X = np.array(X, dtype=np.float32)
         Y = np.array(Y, dtype=np.float32)
         Z = np.array(Z, dtype=np.float32)
-
+        print(X.shape)
+        print(Z.shape)
+        print(Y.shape)
         return [Z, X[:, :self.w], X[:, self.w:]], Y
     
 class DataGeneratorLA2A(Sequence):

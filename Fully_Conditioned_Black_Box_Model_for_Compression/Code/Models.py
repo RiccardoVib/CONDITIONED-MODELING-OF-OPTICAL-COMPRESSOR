@@ -4,8 +4,11 @@ from tensorflow.keras.models import Model
 def create_model_ED_CNN(cond_dim, input_dim, units, activation='sigmoid'):
     D = cond_dim
     T = input_dim//2
+
     cond_inputs = Input(shape=(D), name='enc_cond')
     encoder_inputs = Input(shape=(T, 1), name='enc_input')
+    decoder_inputs = Input(shape=(T), name='dec_input')
+
 
     cond_dense_h = Dense(units, name='Dense_cond_h')(cond_inputs)
     cond_dense_c = Dense(units, name='Dense_cond_c')(cond_inputs)
@@ -15,14 +18,12 @@ def create_model_ED_CNN(cond_dim, input_dim, units, activation='sigmoid'):
 
     states_h = Add()([state_h[:, 0, :], cond_dense_h])
     states_c = Add()([state_c[:, 0, :], cond_dense_c])
-
     encoder_states = [states_h, states_c]
 
-    decoder_inputs = Input(shape=(T, 1), name='dec_input')
+    #decoder_outputs = LSTM(units, return_sequences=False, return_state=False, name='LSTM_De')(decoder_inputs, initial_state=encoder_states)
+    decoder_outputs = Dense(units)(decoder_inputs)
 
-    outputs = LSTM(units, return_sequences=False, return_state=False, name='LSTM_De')(decoder_inputs, initial_state=encoder_states)
-
-    decoder_outputs = Dense(units, activation=activation, name='DenseLay')(outputs)
+    decoder_outputs = Dense(units, activation=activation, name='DenseLay')(decoder_outputs)
 
     decoder_outputs = Dense(T, name='OutLay')(decoder_outputs)
 
