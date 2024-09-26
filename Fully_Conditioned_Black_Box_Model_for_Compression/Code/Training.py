@@ -92,7 +92,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
             model.load_weights(last).expect_partial()
         else:
             # if no weights are found, they are initialized
-            print("Something is wrong.")
+            print("Initializing random weights.")
 
         #train_data
         train_gen = data_generator("TubeTech_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, batch_size=b_size)
@@ -146,14 +146,13 @@ if __name__ == '__main__':
 
     train(data_dir=data_dir,
             model_save_dir='../Models/',
-            save_folder='CL 1B Model',
-            ckpt_flag=True,
+            save_folder='prova',
             b_size=1,
             learning_rate=0.0001,
             units=64,
-            epochs=10,
+            epochs=1,
             activation='sigmoid',
             w_length=32,
             out=16,
             cond=4,
-            inference=True)
+            inference=False)

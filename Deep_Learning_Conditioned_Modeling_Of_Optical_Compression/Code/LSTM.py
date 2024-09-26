@@ -223,7 +223,6 @@ if __name__ == '__main__':
     trainLSTM(data_dir=data_dir,
               model_save_dir='../TrainedModels',
               save_folder='LSTM',
-              ckpt_flag=True,
               b_size=128,
               units=[32, 32],
               learning_rate=0.001,

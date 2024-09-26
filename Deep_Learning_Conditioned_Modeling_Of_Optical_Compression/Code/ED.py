@@ -177,8 +177,6 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
             'Min_train_loss': np.min(results.history['loss']),
             'b_size': b_size,
             'learning_rate': learning_rate,
-            'opt_type': opt_type,
-            'loss_type': loss_type,
             'layers_enc': layers_enc,
             'layers_dec': layers_dec,
             'n_units_enc': n_units_enc,
@@ -225,7 +223,7 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
         x_test = x_test.astype('int16')
         y_test = y_test.astype('int16')
         wavfile.write(pred_dir, int(fs), predictions)
-        wavfile.write(inp_dir, int(fs), y_test)
+        wavfile.write(inp_dir, int(fs), x_test)
         wavfile.write(tar_dir, int(fs), y_test)
 
     return results
@@ -237,7 +235,6 @@ if __name__ == '__main__':
     trainED(data_dir=data_dir,
               model_save_dir='../../TrainedModels',
               save_folder='ED',
-              ckpt_flag=True,
               b_size=128,
               learning_rate=0.001,
               encoder_units=[64],

@@ -1,5 +1,3 @@
-import numpy as np
-import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, LSTM, Add, Conv1D, BatchNormalization, PReLU, Multiply, ReLU
 from tensorflow.keras.models import Model
 

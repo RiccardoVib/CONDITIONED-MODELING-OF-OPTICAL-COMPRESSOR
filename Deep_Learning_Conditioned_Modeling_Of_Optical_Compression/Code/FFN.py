@@ -207,7 +207,6 @@ if __name__ == '__main__':
     trainDense(data_dir=data_dir,
                model_save_dir='../../TrainedModels',
                save_folder='FFN',
-               ckpt_flag=True,
                b_size=128,
                learning_rate=0.001,
                units=[32, 32],

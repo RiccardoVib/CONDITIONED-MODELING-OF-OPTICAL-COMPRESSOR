@@ -83,7 +83,7 @@ class DataGeneratorCL1B(Sequence):
         Z = []#np.empty((self.batch_size, self.cond_size))
 
         step = self.output_size
-        window = 2 * self.w
+        window = self.w
         lag = window - step
 
         # get the indices of the requested batch
@@ -172,7 +172,7 @@ class DataGeneratorLA2A(Sequence):
         Z = []#np.empty((self.batch_size, self.cond_size))
 
         step = self.output_size
-        window = 2 * self.w
+        window = self.w
         lag = window - step
 
         # get the indices of the requested batch
