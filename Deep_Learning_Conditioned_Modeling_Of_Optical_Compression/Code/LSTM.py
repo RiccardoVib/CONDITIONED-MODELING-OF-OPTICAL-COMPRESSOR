@@ -140,7 +140,7 @@ def trainLSTM(data_dir, epochs, seed=422, **kwargs):
     # train
     if not inference:
         results = model.fit(x, y, batch_size=b_size, epochs=epochs, verbose=0,
-                            validation_data=(x_val, y_val), shuffle=False,
+                            validation_data=(x_val, y_val),
                             callbacks=callbacks)
 
      # load the best weights of the model

@@ -126,7 +126,7 @@ def trainDense(data_dir, epochs, seed=422, **kwargs):
     callbacks += [early_stopping_callback]
     # train
     if not inference:
-        results = model.fit(x, y, batch_size=b_size, epochs=epochs, shuffle=False,
+        results = model.fit(x, y, batch_size=b_size, epochs=epochs,
                             validation_data=(x_val, y_val), callbacks=callbacks, verbose=0)
     
     # load the best weights of the model

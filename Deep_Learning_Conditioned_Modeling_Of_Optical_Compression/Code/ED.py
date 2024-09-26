@@ -152,7 +152,7 @@ def trainED(data_dir, epochs, seed=422, **kwargs):
     # train the neural network
     if not inference:
         results = model.fit([x[:, :-1, :], x[:, -1, 0]], y[:, -1], batch_size=b_size, epochs=epochs, verbose=0,
-                            validation_data=([x_val[:, :-1, :], x_val[:, -1, 0]], y_val[:, -1]), shuffle=False,
+                            validation_data=([x_val[:, :-1, :], x_val[:, -1, 0]], y_val[:, -1]),
                             callbacks=callbacks)
     
     
