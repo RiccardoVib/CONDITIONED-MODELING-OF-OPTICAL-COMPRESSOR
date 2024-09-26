@@ -1,5 +1,6 @@
 from tensorflow.keras.layers import Input, Dense, LSTM, Add, Conv1D, BatchNormalization, PReLU, Multiply, ReLU
 from tensorflow.keras.models import Model
+import tensorflow as tf
 
 def create_model_ED_CNN(cond_dim, input_dim, units, activation='sigmoid'):
     D = cond_dim
@@ -7,7 +8,7 @@ def create_model_ED_CNN(cond_dim, input_dim, units, activation='sigmoid'):
 
     cond_inputs = Input(shape=(D), name='enc_cond')
     encoder_inputs = Input(shape=(T, 1), name='enc_input')
-    decoder_inputs = Input(shape=(T), name='dec_input')
+    decoder_inputs = Input(shape=(T, 1), name='dec_input')
 
 
     cond_dense_h = Dense(units, name='Dense_cond_h')(cond_inputs)
@@ -20,17 +21,14 @@ def create_model_ED_CNN(cond_dim, input_dim, units, activation='sigmoid'):
     states_c = Add()([state_c[:, 0, :], cond_dense_c])
     encoder_states = [states_h, states_c]
 
-    #decoder_outputs = LSTM(units, return_sequences=False, return_state=False, name='LSTM_De')(decoder_inputs, initial_state=encoder_states)
-    decoder_outputs = Dense(units)(decoder_inputs)
+    decoder_outputs = LSTM(units,  return_sequences=False, return_state=False, name='LSTM_De')(decoder_inputs, initial_state=encoder_states)
 
     decoder_outputs = Dense(units, activation=activation, name='DenseLay')(decoder_outputs)
-
     decoder_outputs = Dense(T, name='OutLay')(decoder_outputs)
 
     model = Model([cond_inputs, encoder_inputs, decoder_inputs], decoder_outputs)
     model.summary()
     return model
-
 
 #
 # def create_model_TCN(cond_dim, input_dim, out, units, ker, dilation=2):

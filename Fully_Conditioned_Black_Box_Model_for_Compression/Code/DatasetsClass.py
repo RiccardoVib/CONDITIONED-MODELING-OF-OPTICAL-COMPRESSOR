@@ -99,10 +99,7 @@ class DataGeneratorCL1B(Sequence):
         X = np.array(X, dtype=np.float32)
         Y = np.array(Y, dtype=np.float32)
         Z = np.array(Z, dtype=np.float32)
-        print(X.shape)
-        print(Z.shape)
-        print(Y.shape)
-        return [Z, X[:, :self.w], X[:, self.w:]], Y
+        return [Z, X[:, :step], X[:, step:]], Y
     
 class DataGeneratorLA2A(Sequence):
 
@@ -192,4 +189,4 @@ class DataGeneratorLA2A(Sequence):
         Y = np.array(Y, dtype=np.float32)
         Z = np.array(Z, dtype=np.float32)
 
-        return [Z, X[:, :self.w], X[:, self.w:]], Y
+        return [Z, X[:, :step], X[:, step:]], Y
