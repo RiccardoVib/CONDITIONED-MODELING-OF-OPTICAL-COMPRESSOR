@@ -149,7 +149,7 @@ if __name__ == '__main__':
             save_folder='prova',
             b_size=1,
             learning_rate=0.0001,
-            units=8,
+            units=64,
             epochs=1,
             activation='sigmoid',
             w_length=32,
