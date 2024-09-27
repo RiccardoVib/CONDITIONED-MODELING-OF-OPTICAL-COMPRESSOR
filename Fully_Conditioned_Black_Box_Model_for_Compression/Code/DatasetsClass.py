@@ -24,9 +24,11 @@ import numpy as np
 from scipy.signal.windows import tukey
 from tensorflow.keras.utils import Sequence
 
+
 class DataGeneratorCL1B(Sequence):
 
-    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False, batch_size=10):
+    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False,
+                 batch_size=10):
         """
         Initializes a data generator object
           :param filename: name of the dataset
@@ -40,14 +42,12 @@ class DataGeneratorCL1B(Sequence):
         """
         file_data = open(os.path.normpath('/'.join([data_dir, filename])), 'rb')
         Z = pickle.load(file_data)
-        x = np.array(Z['input'][:10], dtype=np.float32)
-        y = np.array(Z['target'][:10], dtype=np.float32)
-        z = np.array(Z['cond'][:10], dtype=np.float32)
-
+        x = np.array(Z['input'][:], dtype=np.float32)
+        y = np.array(Z['target'][:], dtype=np.float32)
+        z = np.array(Z['cond'][:], dtype=np.float32)
 
         x = x * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
         y = y * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
-
 
         self.x = x
         self.y = y
@@ -78,16 +78,16 @@ class DataGeneratorCL1B(Sequence):
 
     def __getitem__(self, idx):
         ## Initializing Batch
-        X = []#np.empty((self.batch_size, 2*self.w))
-        Y = []#np.empty((self.batch_size, self.output_size))
-        Z = []#np.empty((self.batch_size, self.cond_size))
+        X = []  # np.empty((self.batch_size, 2*self.w))
+        Y = []  # np.empty((self.batch_size, self.output_size))
+        Z = []  # np.empty((self.batch_size, self.cond_size))
 
         step = self.output_size
         window = self.w
         lag = window - step
 
         # get the indices of the requested batch
-        indices = self.indices[idx*self.batch_size:(idx+1)*self.batch_size]
+        indices = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
 
         length = self.x.shape[1]
         for i in indices:
@@ -100,10 +100,12 @@ class DataGeneratorCL1B(Sequence):
         Y = np.array(Y, dtype=np.float32)
         Z = np.array(Z, dtype=np.float32)
         return [Z, X[:, :step], X[:, step:]], Y
-    
+
+
 class DataGeneratorLA2A(Sequence):
 
-    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False, batch_size=10):
+    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False,
+                 batch_size=10):
         """
         Initializes a data generator object
           :param filename: name of the dataset
@@ -126,8 +128,8 @@ class DataGeneratorLA2A(Sequence):
         length = x.shape[1]
 
         samples10 = 441000
-        sec10 = length//samples10
-        lim = sec10*samples10
+        sec10 = length // samples10
+        lim = sec10 * samples10
 
         x = x[:, :lim]
         y = y[:, :lim]
@@ -135,8 +137,8 @@ class DataGeneratorLA2A(Sequence):
         self.x = x.reshape(-1, samples10)
         self.y = y.reshape(-1, samples10)
 
-        z0 = np.repeat(z[:, 0], self.x.shape[0]//3).reshape(-1, 1)
-        z1 = np.repeat(z[:, 1], self.x.shape[0]//3).reshape(-1, 1)
+        z0 = np.repeat(z[:, 0], self.x.shape[0] // 3).reshape(-1, 1)
+        z1 = np.repeat(z[:, 1], self.x.shape[0] // 3).reshape(-1, 1)
 
         self.z = np.concatenate((z0, z1), axis=-1)
 
@@ -166,16 +168,16 @@ class DataGeneratorLA2A(Sequence):
 
     def __getitem__(self, idx):
         ## Initializing Batch
-        X = []#np.empty((self.batch_size, 2*self.w))
-        Y = []#np.empty((self.batch_size, self.output_size))
-        Z = []#np.empty((self.batch_size, self.cond_size))
+        X = []  # np.empty((self.batch_size, 2*self.w))
+        Y = []  # np.empty((self.batch_size, self.output_size))
+        Z = []  # np.empty((self.batch_size, self.cond_size))
 
         step = self.output_size
         window = self.w
         lag = window - step
 
         # get the indices of the requested batch
-        indices = self.indices[idx*self.batch_size:(idx+1)*self.batch_size]
+        indices = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
 
         length = self.x.shape[1]
 

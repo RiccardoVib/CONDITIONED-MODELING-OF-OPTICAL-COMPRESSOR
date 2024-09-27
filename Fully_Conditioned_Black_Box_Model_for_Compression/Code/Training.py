@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     train(data_dir=data_dir,
             model_save_dir='../Models/',
-            save_folder='prova',
+            save_folder='CL 1B Model',
             b_size=1,
             learning_rate=0.0001,
             units=64,
@@ -155,4 +155,4 @@ if __name__ == '__main__':
             w_length=32,
             out=16,
             cond=4,
-            inference=False)
+            inference=True)
