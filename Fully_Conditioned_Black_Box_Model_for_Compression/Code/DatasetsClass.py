@@ -119,10 +119,10 @@ class DataGeneratorLA2A(Sequence):
         """
         file_data = open(os.path.normpath('/'.join([data_dir, filename])), 'rb')
         Z = pickle.load(file_data)
-        x = np.array(Z['input'], dtype=np.float32)
-        y = np.array(Z['target'], dtype=np.float32)
-        z1 = np.array(Z['switch'], dtype=np.float32)
-        z2 = np.array(Z['peak'], dtype=np.float32)
+        x = np.array(Z[0]['input'], dtype=np.float32)
+        y = np.array(Z[0]['target'], dtype=np.float32)
+        z1 = np.array(Z[0]['switch'], dtype=np.float32)
+        z2 = np.array(Z[0]['peak'], dtype=np.float32)
 
         z = np.zeros((x.shape[0], 2))
         for i in range(x.shape[0]):

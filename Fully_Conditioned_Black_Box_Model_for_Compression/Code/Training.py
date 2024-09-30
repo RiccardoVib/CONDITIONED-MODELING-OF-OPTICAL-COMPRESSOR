@@ -159,4 +159,4 @@ if __name__ == '__main__':
             w_length=32,
             out=16,
             cond=4,
-            inference=True)
+            inference=False)
