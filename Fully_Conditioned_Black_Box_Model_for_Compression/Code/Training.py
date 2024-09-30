@@ -99,9 +99,9 @@ def train(data_dir, epochs, seed=422, **kwargs):
             print("Initializing random weights.")
 
         #train_data
-        train_gen = data_generator(filename + "_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, batch_size=b_size)
+        train_gen = data_generator(filename + "_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, set='train', batch_size=b_size)
         #val_data
-        val_gen = data_generator(filename + "_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, batch_size=b_size)
+        val_gen = data_generator(filename + "_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, set='test', batch_size=b_size)
 
         results = model.fit(train_gen, epochs=epochs, verbose=0, validation_data=val_gen, shuffle=False, callbacks=callbacks)
 
@@ -123,7 +123,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
         # if no weights are found, there is something wrong
         print("Something is wrong.")
         
-    test_gen = data_generator(filename + "_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, batch_size=b_size)
+    test_gen = data_generator(filename + "_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, set='test', batch_size=b_size)
 
     # compute test loss
     test_loss = model.evaluate(test_gen, verbose=0, return_dict=True)
@@ -159,4 +159,4 @@ if __name__ == '__main__':
             w_length=32,
             out=16,
             cond=4,
-            inference=False)
+            inference=True)

@@ -27,7 +27,7 @@ from tensorflow.keras.utils import Sequence
 
 class DataGeneratorCL1B(Sequence):
 
-    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False,
+    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, set='train', shuffle=False,
                  batch_size=10):
         """
         Initializes a data generator object
@@ -104,7 +104,7 @@ class DataGeneratorCL1B(Sequence):
 
 class DataGeneratorLA2A(Sequence):
 
-    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False,
+    def __init__(self, filename, data_dir, input_enc_size, input_dec_size, output_size, cond_size, shuffle=False, set='train',
                  batch_size=10):
         """
         Initializes a data generator object
@@ -119,14 +119,22 @@ class DataGeneratorLA2A(Sequence):
         """
         file_data = open(os.path.normpath('/'.join([data_dir, filename])), 'rb')
         Z = pickle.load(file_data)
-        x = np.array(Z[0]['input'], dtype=np.float32)
-        y = np.array(Z[0]['target'], dtype=np.float32)
-        z1 = np.array(Z[0]['switch'], dtype=np.float32)
-        z2 = np.array(Z[0]['peak'], dtype=np.float32)
-
-        z = np.zeros((x.shape[0], 2))
-        for i in range(x.shape[0]):
-            z[i] = np.array([z1[i], z2[i]/100])
+        if set == 'train':
+            x = np.array(Z[0]['input'], dtype=np.float32)
+            y = np.array(Z[0]['target'], dtype=np.float32)
+            z1 = np.array(Z[0]['switch'], dtype=np.float32)
+            z2 = np.array(Z[0]['peak'], dtype=np.float32)
+        elif set == 'val':
+            x = np.array(Z[1]['input'], dtype=np.float32)
+            y = np.array(Z[1]['target'], dtype=np.float32)
+            z1 = np.array(Z[1]['switch'], dtype=np.float32)
+            z2 = np.array(Z[1]['peak'], dtype=np.float32)
+        else:
+            x = np.array(Z['input'], dtype=np.float32)
+            y = np.array(Z['target'], dtype=np.float32)
+            z1 = np.array(Z['switch'], dtype=np.float32)
+            z2 = np.array(Z['peak'], dtype=np.float32)
+        del Z
 
         x = x * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
         y = y * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
@@ -140,13 +148,13 @@ class DataGeneratorLA2A(Sequence):
         x = x[:, :lim]
         y = y[:, :lim]
 
+        z1 = np.repeat(z1, lim).reshape(-1, 1)
+        z2 = np.repeat(z2/100, lim).reshape(-1, 1)
+
+        self.z = np.concatenate((z1, z2), axis=-1)
+
         self.x = x.reshape(-1, samples10)
         self.y = y.reshape(-1, samples10)
-
-        z0 = np.repeat(z[:, 0], self.x.shape[0] // 3).reshape(-1, 1)
-        z1 = np.repeat(z[:, 1], self.x.shape[0] // 3).reshape(-1, 1)
-
-        self.z = np.concatenate((z0, z1), axis=-1)
 
         self.data_dir = data_dir
         self.input_enc_size = input_enc_size
@@ -189,9 +197,9 @@ class DataGeneratorLA2A(Sequence):
 
         for i in indices:
             for t in range(0, length - window, step):
-                X.append(np.array(self.x[i, t:t + window]).T)
-                Y.append(np.array(self.y[i, t + lag:t + window]).T)
-                Z.append(np.array([self.z[i, 0], self.z[i, 1]]).T)
+                X.append(self.x[i, t:t + window].T)
+                Y.append(self.y[i, t + lag:t + window].T)
+                Z.append(self.z[i].T)
 
         X = np.array(X, dtype=np.float32)
         Y = np.array(Y, dtype=np.float32)
