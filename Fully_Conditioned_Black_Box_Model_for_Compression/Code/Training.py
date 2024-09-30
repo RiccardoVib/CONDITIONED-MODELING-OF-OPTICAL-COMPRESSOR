@@ -55,8 +55,12 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
     if D == 4:
         data_generator = DataGeneratorCL1B
+        filename = 'TubeTech'
+        fs = 48000
     else:
         data_generator = DataGeneratorLA2A
+        filename = 'LA2A'
+        fs = 44100
 
     # set all the seed in case reproducibility is desired
     #np.random.seed(422)
@@ -95,9 +99,9 @@ def train(data_dir, epochs, seed=422, **kwargs):
             print("Initializing random weights.")
 
         #train_data
-        train_gen = data_generator("TubeTech_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, batch_size=b_size)
+        train_gen = data_generator(filename + "_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, batch_size=b_size)
         #val_data
-        val_gen = data_generator("TubeTech_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, batch_size=b_size)
+        val_gen = data_generator(filename + "_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, batch_size=b_size)
 
         results = model.fit(train_gen, epochs=epochs, verbose=0, validation_data=val_gen, shuffle=False, callbacks=callbacks)
 
@@ -119,7 +123,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
         # if no weights are found, there is something wrong
         print("Something is wrong.")
         
-    test_gen = data_generator("TubeTech_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, batch_size=b_size)
+    test_gen = data_generator(filename + "_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, batch_size=b_size)
 
     # compute test loss
     test_loss = model.evaluate(test_gen, verbose=0, return_dict=True)
@@ -127,7 +131,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
     print('Test Loss: ', test_loss)
     predictions = model.predict(test_gen, verbose=0)
     # plot and render the output audio file, together with the input and target
-    predictWaves(predictions, test_gen.x.reshape(-1), test_gen.y.reshape(-1), model_save_dir, save_folder, 48000)
+    predictWaves(predictions, test_gen.x.reshape(-1), test_gen.y.reshape(-1), model_save_dir, save_folder, fs)
 
     results_ = {'Test_Loss': test_loss}
 
@@ -141,7 +145,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
 if __name__ == '__main__':
     data_dir = '../Files' # data folder to dataset
-    data_dir = 'C:/Users/riccarsi/OneDrive - Universitetet i Oslo/Datasets/Compressors/DatasetOLD' # data folder to dataset
+    #data_dir = 'C:/Users/riccarsi/OneDrive - Universitetet i Oslo/Datasets/Compressors/DatasetOLD' # data folder to dataset
     seed = 422 # seed in case reproducibility is desired
 
     train(data_dir=data_dir,

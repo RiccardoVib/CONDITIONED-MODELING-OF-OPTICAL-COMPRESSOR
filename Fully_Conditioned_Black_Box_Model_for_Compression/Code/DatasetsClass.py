@@ -121,7 +121,13 @@ class DataGeneratorLA2A(Sequence):
         Z = pickle.load(file_data)
         x = np.array(Z['input'], dtype=np.float32)
         y = np.array(Z['target'], dtype=np.float32)
-        z = np.array(Z['cond'], dtype=np.float32)
+        z1 = np.array(Z['switch'], dtype=np.float32)
+        z2 = np.array(Z['peak'], dtype=np.float32)
+
+        z = np.zeros((x.shape[0], 2))
+        for i in range(x.shape[0]):
+            z[i] = np.array([z1[i], z2[i]/100])
+
         x = x * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
         y = y * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
 
