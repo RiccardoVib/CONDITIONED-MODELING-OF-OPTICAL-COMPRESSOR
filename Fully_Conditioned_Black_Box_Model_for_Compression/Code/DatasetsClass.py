@@ -16,14 +16,17 @@
 # its authors by adding a reference to this publication:
 #
 # R. Simionato, 2023, "Fully Conditioned Black Box Model for Compression" in proceedings of the 23th Digital Audio Effect Conference, Copenaghen, Denmark.
-
-
+import glob
 import pickle
 import os
 import numpy as np
+from scipy.io import wavfile
 from scipy.signal.windows import tukey
 from tensorflow.keras.utils import Sequence
-
+from audio_format import pcm2float
+import librosa
+import matplotlib.pyplot as plt
+from Utils import filterAudio
 
 class DataGeneratorCL1B(Sequence):
 
@@ -48,7 +51,7 @@ class DataGeneratorCL1B(Sequence):
 
         x = x * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
         y = y * np.array(tukey(x.shape[1], alpha=0.000005), dtype=np.float32).reshape(1, -1)
-
+        #
         self.x = x
         self.y = y
         self.z = z

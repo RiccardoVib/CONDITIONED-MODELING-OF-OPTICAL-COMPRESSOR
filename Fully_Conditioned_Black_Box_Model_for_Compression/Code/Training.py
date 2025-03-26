@@ -26,6 +26,8 @@ from Models import create_model_ED_CNN
 from DatasetsClass import DataGeneratorCL1B, DataGeneratorLA2A
 import numpy as np
 import random
+import matplotlib.pyplot as plt
+from Utils import filterAudio
 
 def train(data_dir, epochs, seed=422, **kwargs):
     """
@@ -129,7 +131,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
     test_loss = model.evaluate(test_gen, verbose=0, return_dict=True)
 
     print('Test Loss: ', test_loss)
-    predictions = model.predict(test_gen, verbose=0)
+    predictions = model.predict(test_gen, verbose=0).reshape(-1)
     # plot and render the output audio file, together with the input and target
     predictWaves(predictions, test_gen.x.reshape(-1), test_gen.y.reshape(-1), model_save_dir, save_folder, fs)
 
@@ -145,12 +147,11 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
 if __name__ == '__main__':
     data_dir = '../Files' # data folder to dataset
-    #data_dir = 'C:/Users/riccarsi/OneDrive - Universitetet i Oslo/Datasets/Compressors/DatasetOLD' # data folder to dataset
     seed = 422 # seed in case reproducibility is desired
 
     train(data_dir=data_dir,
-            model_save_dir='../Models/',
-            save_folder='CL 1B Model',
+            model_save_dir='../Models/Prove',
+            save_folder='CL1B',
             b_size=1,
             learning_rate=0.0001,
             units=64,
