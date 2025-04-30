@@ -27,7 +27,6 @@ from DatasetsClass import DataGeneratorCL1B, DataGeneratorLA2A
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-from Utils import filterAudio
 
 def train(data_dir, epochs, seed=422, **kwargs):
     """
@@ -95,7 +94,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
         last = tf.train.latest_checkpoint(ckpt_dir_latest)
         if last is not None:
             print("Restored weights from {}".format(ckpt_dir))
-            model.load_weights(last).expect_partial()
+            model.load_weights(ckpt_dir_latest + '/last.weights.h5')
         else:
             # if no weights are found, they are initialized
             print("Initializing random weights.")
@@ -116,15 +115,29 @@ def train(data_dir, epochs, seed=422, **kwargs):
 
         print("Training done")
     
+    # last = tf.train.latest_checkpoint(ckpt_dir_latest)
+    # if last is not None:
+    #     print("Restored weights from {}".format(ckpt_dir_latest))
+    #     model.load_weights(last)
+    #     model.save_weights(ckpt_dir_latest + '/last.weights.h5')  # Save in a supported format
+    #     model.load_weights(ckpt_dir_latest + '/last.weights.h5')
+    # else:
+    #     # if no weights are found,the weights are random generated
+    #     print("Initializing random weights.")
+
     # load the best weights of the model
     best = tf.train.latest_checkpoint(ckpt_dir)
     if best is not None:
         print("Restored weights from {}".format(ckpt_dir))
-        model.load_weights(best).expect_partial()
+        #model.load_weights(best).expect_partial()
+        #model.save_weights(ckpt_dir + '/best.weights.h5')  # Save in a supported format
+        model.load_weights(ckpt_dir + '/best.weights.h5')
+        print("Loading the saved weights.")
+
     else:
         # if no weights are found, there is something wrong
         print("Something is wrong.")
-        
+
     test_gen = data_generator(filename + "_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, set='test', batch_size=b_size)
 
     # compute test loss
@@ -150,8 +163,8 @@ if __name__ == '__main__':
     seed = 422 # seed in case reproducibility is desired
 
     train(data_dir=data_dir,
-            model_save_dir='../Models/Prove',
-            save_folder='CL1B',
+            model_save_dir='../Models/',
+            save_folder=' Model',
             b_size=1,
             learning_rate=0.0001,
             units=64,
