@@ -77,7 +77,7 @@ def train(data_dir, epochs, seed=422, **kwargs):
         
   
     # create the model
-    model = create_model_ED_CNN(D, T, units, activation)
+    model = create_model_ED_CNN(D, T, units, activation='sigmoid')
     # define the Adam optimizer with the initial learning rate
     opt = tf.keras.optimizers.legacy.Adam(learning_rate=learning_rate, clipnorm=1)
     # compile the model
@@ -94,15 +94,15 @@ def train(data_dir, epochs, seed=422, **kwargs):
         last = tf.train.latest_checkpoint(ckpt_dir_latest)
         if last is not None:
             print("Restored weights from {}".format(ckpt_dir))
-            model.load_weights(ckpt_dir_latest + '/last.weights.h5')
+            model.load_weights(ckpt_dir_latest + '/weights.h5')
         else:
             # if no weights are found, they are initialized
             print("Initializing random weights.")
 
         #train_data
-        train_gen = data_generator(filename + "_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, set='train', batch_size=b_size)
+        train_gen = data_generator(filename + "_train.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=T//4, cond_size=D, shuffle=False, set='train', batch_size=b_size)
         #val_data
-        val_gen = data_generator(filename + "_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=o, cond_size=D, shuffle=False, set='test', batch_size=b_size)
+        val_gen = data_generator(filename + "_test.pickle", data_dir, input_enc_size=T//2, input_dec_size=T//2, output_size=T//4, cond_size=D, shuffle=False, set='test', batch_size=b_size)
 
         results = model.fit(train_gen, epochs=epochs, verbose=0, validation_data=val_gen, shuffle=False, callbacks=callbacks)
 
@@ -114,24 +114,14 @@ def train(data_dir, epochs, seed=422, **kwargs):
         plotTraining(loss_training, loss_val, model_save_dir, save_folder)
 
         print("Training done")
-    
-    # last = tf.train.latest_checkpoint(ckpt_dir_latest)
-    # if last is not None:
-    #     print("Restored weights from {}".format(ckpt_dir_latest))
-    #     model.load_weights(last)
-    #     model.save_weights(ckpt_dir_latest + '/last.weights.h5')  # Save in a supported format
-    #     model.load_weights(ckpt_dir_latest + '/last.weights.h5')
-    # else:
-    #     # if no weights are found,the weights are random generated
-    #     print("Initializing random weights.")
 
     # load the best weights of the model
     best = tf.train.latest_checkpoint(ckpt_dir)
     if best is not None:
         print("Restored weights from {}".format(ckpt_dir))
         #model.load_weights(best).expect_partial()
-        #model.save_weights(ckpt_dir + '/best.weights.h5')  # Save in a supported format
-        model.load_weights(ckpt_dir + '/best.weights.h5')
+        #model.save_weights(ckpt_dir + '/weights.h5')  # Save in a supported format
+        model.load_weights(ckpt_dir + '/weights.h5')
         print("Loading the saved weights.")
 
     else:
@@ -156,21 +146,3 @@ def train(data_dir, epochs, seed=422, **kwargs):
             print('\n', key, '  : ', value, file=f)
 
     return results_
-
-
-if __name__ == '__main__':
-    data_dir = '../Files' # data folder to dataset
-    seed = 422 # seed in case reproducibility is desired
-
-    train(data_dir=data_dir,
-            model_save_dir='../Models/',
-            save_folder=' Model',
-            b_size=1,
-            learning_rate=0.0001,
-            units=64,
-            epochs=1,
-            activation='sigmoid',
-            w_length=32,
-            out=16,
-            cond=4,
-            inference=True)
