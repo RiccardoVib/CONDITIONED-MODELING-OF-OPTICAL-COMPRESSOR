@@ -13,7 +13,7 @@ def parse_args():
 
     parser.add_argument('--data_dir', default='./datasets', type=str, nargs='?', help='Folder directory in which the datasets are stored.')
 
-    parser.add_argument('--datasets', default=[" "], nargs='+', help='The names of the datasets to use.')
+    parser.add_argument('--datasets', default=" ", nargs='+',type=str, help='The names of the datasets to use.')
 
     parser.add_argument('--epochs', default=60, type=int, nargs='?', help='Number of training epochs.')
 
@@ -21,7 +21,7 @@ def parse_args():
 
     parser.add_argument('--w_length', default=16, type=int, nargs='?', help='Input temporal size.')
 
-    parser.add_argument('--units', default=8, nargs='+', help='Hidden layer sizes (amount of units) of the network.')
+    parser.add_argument('--units', default=8, nargs='+', type=int, help='Hidden layer sizes (amount of units) of the network.')
 
     parser.add_argument('--learning_rate', default=3e-4, type=float, nargs='?', help='Initial learning rate.')
 
