@@ -1,5 +1,7 @@
 This code repository for the article _Deep Learning Conditioned Modeling of Optical Compression_ and _Fully Conditioned and Low Latency Black-boc Model of Analog Compression_, Proceedings of the DAFx Conferences 2022-23.
 
+This repository contains all the necessary utilities to use our architectures. Find the code located inside the "./Code" folder, and the weights of pre-trained models inside the "./Models" folder
+
 # DEEP LEARNING CONDITIONED MODELING OF OPTICAL COMPRESSION
 Datsets are available at the following link:
 [CL 1B Dataset (2 parameters)](https://doi.org/10.5281/zenodo.6497085)
@@ -8,10 +10,6 @@ Datsets are available at the following link:
 # FULLY CONDITIONED AND LOW LATENCY BLACK-BOX MODEL OF ANALOG COMPRESSION COMPRESSION
  
 Visit our [companion page with audio examples](https://riccardovib.github.io/OpticalCompressor_pages/)
-
-This repository contains all the necessary utilities to use our architectures. Find the code located inside the "./Code" folder, and the weights of pre-trained models inside the "./Weights" folder
-
-Visit our [companion page with audio examples](https://riccardovib.github.io/Hybrid-Neural-Audio-Effects_pages/)
 
 ### Contents
 
