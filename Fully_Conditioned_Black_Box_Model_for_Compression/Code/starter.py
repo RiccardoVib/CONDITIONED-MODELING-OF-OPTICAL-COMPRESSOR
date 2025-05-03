@@ -13,7 +13,7 @@ def parse_args():
 
     parser.add_argument('--data_dir', default='./datasets', type=str, nargs='?', help='Folder directory in which the datasets are stored.')
 
-    parser.add_argument('--datasets', default=[" "], nargs='+', help='The names of the datasets to use. Datasets = [CL1BTapePreamp, TapePreamp, CL1BTape, CL1BPreamp].')
+    parser.add_argument('--datasets', default=[" "], nargs='+', help='The names of the datasets to use.')
 
     parser.add_argument('--epochs', default=60, type=int, nargs='?', help='Number of training epochs.')
 
