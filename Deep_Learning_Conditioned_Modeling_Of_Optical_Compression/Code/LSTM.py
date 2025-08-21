@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Riccardo Simionato, University of Oslo
+# Copyright (C) 2022 Riccardo Simionato, University of Oslo
 # Inquiries: riccardo.simionato.vib@gmail.com.com
 #
 # This code is free software: you can redistribute it and/or modify it under the terms
@@ -15,7 +15,8 @@
 # If you use this code or any part of it in any program or publication, please acknowledge
 # its authors by adding a reference to this publication:
 #
-# R. Simionato, 2023, "Deep Learning Conditioned Modeling of Optical Compression" in proceedings of the 22th Digital Audio Effect Conference, Vienna, Austria.
+# R. Simionato, 2022, "Deep Learning Conditioned Modeling of Optical Compression" in proceedings of the 22th Digital Audio Effect Conference, Vienna, Austria.
+
 
 
 

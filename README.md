@@ -2,7 +2,29 @@ This code repository for the article _Deep Learning Conditioned Modeling of Opti
 
 This repository contains all the necessary utilities to use our architectures. Find the code located inside the "./Code" folder, and the weights of pre-trained models inside the "./Models" folder
 
+
+### Folder Structure
+
+```
+./
+ ├── Deep_Learning_Conditioned_Modeling_Of_Optical_Compression
+ │     ├── Code
+ │     ├── Models
+ │     ├── Target_test_sounds
+ │     └── Test_sounds  
+ ├── Fully_Conditioned_Black_Box_Model_for_Compression
+ │     ├── Code
+ │     └── Models  
+ │           ├── CL1BModel
+ │           ├── FETModel
+ │           ├── LA2AModel
+ │           ├── PSPModel
+ │           └── TCN-CL1BModel     
+ └── requirements   
+```
+
 # DEEP LEARNING CONDITIONED MODELING OF OPTICAL COMPRESSION
+
 Datsets are available at the following link:
 [CL 1B Dataset (2 parameters)](https://doi.org/10.5281/zenodo.6497085)
  
@@ -76,3 +98,28 @@ The repo include two analog (CL1B, LA2A) and three digital (FET, PSP, Presswerk)
 # VST Download
 
 Coming soon...
+
+# Bibtex
+
+If you use the code included in this repository or any part of it, please acknowledge 
+its authors by adding a reference to these publications:
+
+```
+@inproceedings{simionato2022depp,
+  title={Deep Learning Conditioned Modeling of Optical Compression},
+  author={Simionato, Riccardo and Fasciani, Stefano},
+  booktitle = {Proceedings of the International Conference on Digital Audio Effects (DAFx22)},
+  year = {2022},
+  address = {Vienna, Austria},
+}
+```
+
+```
+@inproceedings{simionato2023fully,
+  title={Fully Conditioned and Low Latency Black-boc Model of Analog Compression},
+  author={Simionato, Riccardo and Fasciani, Stefano},
+  booktitle = {Proceedings of the International Conference on Digital Audio Effects (DAFx23)},
+  year = {2023},
+  address = {Copenhagen, Denmark},
+}
+```
