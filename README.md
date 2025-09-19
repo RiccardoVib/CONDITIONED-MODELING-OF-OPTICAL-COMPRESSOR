@@ -92,12 +92,12 @@ cd ./Code/
 python starter.py --datasets CL1B --save_folder CL1BModel --only_inference True
 ```
 
-The repo include two analog (CL1B, LA2A) and three digital (FET, PSP, Presswerk) pre-trained models.
+The repo includes two analog (CL1B, LA2A) and three digital (FET, PSP, Presswerk) pre-trained models.
 
 
 # VST Download
 
-Coming soon...
+[VSTs](https://github.com/RiccardoVib/NeuralModelsVST/tree/main)
 
 # Bibtex
 
